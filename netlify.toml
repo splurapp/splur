@@ -19,3 +19,6 @@
     max-age=31536000,
     immutable
     '''
+
+[[plugins]]
+  package = "@netlify/plugin-lighthouse"
