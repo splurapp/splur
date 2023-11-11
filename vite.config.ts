@@ -13,7 +13,7 @@ export default defineConfig({
         enabled: true,
       },
       manifest: {
-        name: "Splur",
+        name: "Splur - Personal Expense Manager",
         short_name: "Splur",
         description: "An open source personal expense manager app",
         theme_color: "#14b8a5",

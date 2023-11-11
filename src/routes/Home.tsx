@@ -1,14 +1,4 @@
-import db from "../model/db";
-
 export default function Home() {
-  const createWallet = async (name = "Cash") => {
-    const id = await db.wallets.add({
-      name: "Sontosh",
-      type: "Cash",
-    });
-    console.log(id);
-  };
-
   return (
     <div className="m-5">
       <div className="stats bg-primary text-primary-content">
