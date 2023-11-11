@@ -12,7 +12,7 @@ import AccountSetup from "./setup/AccountSetup";
 import Hello from "./setup/Hello";
 import Welcome from "./setup/Welcome";
 import SetupLayout from "./setup/SetupLayout";
-import Dev from "./dev/dev";
+import Dev from "./dev/Dev";
 
 export const router = createBrowserRouter([
   {

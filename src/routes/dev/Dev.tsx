@@ -23,9 +23,11 @@ export default function Dev() {
     await refreshWallet();
   };
 
-  const deleteWallet = async (id: number) => {
-    await WalletOperations.remove(id);
-    await refreshWallet();
+  const deleteWallet = async (id: number | undefined) => {
+    if (id) {
+      await WalletOperations.remove(id);
+      await refreshWallet();
+    }
   };
   return (
     <div>
