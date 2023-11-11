@@ -1,13 +1,17 @@
-import { createBrowserRouter } from "react-router-dom";
-import Home from "./Home";
-import About from "./About";
 import Layout from "@/layout";
-import Track from "./Track";
-import Settings from "./Settings";
-import Accounts from "./Accounts";
-import Setup from "./Setup";
+import { createBrowserRouter } from "react-router-dom";
+import About from "./About";
 import Borrowing from "./Borrowing";
+import Home from "./Home";
 import Notifications from "./Notifications";
+import Settings from "./Settings";
+import Track from "./Track";
+import Accounts from "./accounts";
+import NewAccount from "./accounts/new";
+import AccountSetup from "./setup/AccountSetup";
+import Hello from "./setup/Hello";
+import Welcome from "./setup/Welcome";
+import SetupLayout from "./setup/SetupLayout";
 
 export const router = createBrowserRouter([
   {
@@ -15,35 +19,58 @@ export const router = createBrowserRouter([
     element: <Layout />,
     children: [
       {
-        path: "/",
+        index: true,
         element: <Home />,
       },
       {
-        path: "/setup",
-        element: <Setup />,
+        path: "setup",
+        element: <SetupLayout />,
+        children: [
+          {
+            index: true,
+            element: <Hello />,
+          },
+          {
+            path: "account",
+            element: <AccountSetup />,
+          },
+          {
+            path: "welcome",
+            element: <Welcome />,
+          },
+        ],
       },
       {
-        path: "/track",
+        path: "track",
         element: <Track />,
       },
       {
-        path: "/accounts",
-        element: <Accounts />,
+        path: "accounts",
+        children: [
+          {
+            index: true,
+            element: <Accounts />,
+          },
+          {
+            path: "new",
+            element: <NewAccount />,
+          },
+        ],
       },
       {
-        path: "/borrowing",
+        path: "borrowing",
         element: <Borrowing />,
       },
       {
-        path: "/settings",
+        path: "settings",
         element: <Settings />,
       },
       {
-        path: "/notifications",
+        path: "notifications",
         element: <Notifications />,
       },
       {
-        path: "/about",
+        path: "about",
         element: <About />,
       },
     ],
