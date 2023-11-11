@@ -12,6 +12,7 @@ import AccountSetup from "./setup/AccountSetup";
 import Hello from "./setup/Hello";
 import Welcome from "./setup/Welcome";
 import SetupLayout from "./setup/SetupLayout";
+import Dev from "./dev/dev";
 
 export const router = createBrowserRouter([
   {
@@ -72,6 +73,10 @@ export const router = createBrowserRouter([
       {
         path: "about",
         element: <About />,
+      },
+      {
+        path: "dev",
+        element: <Dev />,
       },
     ],
   },
