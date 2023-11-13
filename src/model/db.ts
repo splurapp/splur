@@ -96,7 +96,7 @@ export class MySubClassedDexie extends Dexie {
     this.version(1).stores({
       wallets: "++id, &name",
       user: "&name",
-      splurTransactions: "++id, timestamp, assignedTo",
+      splurTransactions: "++id, timestamp, assignedTo, transferFrom",
       preferences: "id",
       categoryMaps: "++id",
       importStatementConfigs: "&name",
