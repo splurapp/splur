@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Wallet, WalletType } from "@/model/db";
 import { WalletOperations } from "@/model/walletOps";
 import EditWallet from "./EditWallet";
+import Transactions from "./Transactions";
 
 export default function Dev() {
   const [wallets, setWallets] = useState<Wallet[]>([]);
@@ -57,6 +58,7 @@ export default function Dev() {
               Delete
             </button>
             <EditWallet info={item} refresh={refreshWallet} />
+            <Transactions wallet={item} refresh={refreshWallet} />
           </div>
         ))}
       </div>
@@ -73,7 +75,7 @@ export default function Dev() {
         type="number"
         placeholder="initial amount"
         value={walletAmount}
-        onChange={e => setWalletAmount(parseInt(e.target.value))}
+        onChange={e => setWalletAmount(parseFloat(e.target.value))}
       ></input>
       <br></br>
       <br></br>
