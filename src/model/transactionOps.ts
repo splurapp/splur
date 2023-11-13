@@ -5,7 +5,12 @@ import { WalletOperations } from "./walletOps";
 export class TransactionOperations {
   static async get(walletId?: number): Promise<SplurTransaction[]> {
     if (walletId) {
-      return await db.splurTransactions.where("assignedTo").equals(walletId).toArray();
+      return await db.splurTransactions
+        .where("assignedTo")
+        .equals(walletId)
+        .or("transferFrom")
+        .equals(walletId)
+        .toArray();
     }
 
     return await db.splurTransactions.toArray();
