@@ -4,6 +4,8 @@ import { WalletOperations } from "@/model/walletOps";
 import { useEffect, useState } from "react";
 
 type Props = {
+  wallet: Wallet;
+  disabled: boolean;
   transaction: SplurTransaction;
   refreshTransactions: () => Promise<void>;
 };
@@ -58,11 +60,18 @@ const getExchangeType = (i: string) => {
   return ExchangeType.TRANSFER;
 };
 
-export default function EditTransaction({ transaction, refreshTransactions }: Props) {
+export default function EditTransaction({
+  wallet,
+  disabled,
+  transaction,
+  refreshTransactions,
+}: Props) {
   const [show, setShow] = useState(false);
   const [wallets, setWallets] = useState<Wallet[]>([]);
 
-  const [transferTo, setTransferTo] = useState(0);
+  const [transferTo, setTransferTo] = useState(() =>
+    transaction.transferTo ? transaction.transferTo : 0,
+  );
   const [category, setCategory] = useState<string>(() =>
     transaction?.category ? transaction.category : "None",
   );
@@ -73,10 +82,7 @@ export default function EditTransaction({ transaction, refreshTransactions }: Pr
   const [amount, setAmount] = useState(() => transaction.amount);
 
   const updateTransaction = async () => {
-    if (
-      exchangeType === ExchangeType.TRANSFER &&
-      (transaction.assignedTo === transferTo || transferTo === 0)
-    ) {
+    if (exchangeType === ExchangeType.TRANSFER && (wallet.id === transferTo || transferTo === 0)) {
       return;
     }
 
@@ -93,7 +99,7 @@ export default function EditTransaction({ transaction, refreshTransactions }: Pr
         ...transaction,
         amount: amount,
         exchangeType: exchangeType,
-        transferFrom: transaction.assignedTo,
+        transferFrom: wallet.id,
         transferTo: transferTo,
         assignedTo: transferTo,
       };
@@ -117,11 +123,11 @@ export default function EditTransaction({ transaction, refreshTransactions }: Pr
     <>
       {!show && (
         <>
-          <button className="btn" onClick={() => setShow(!show)}>
+          <button className={`btn ${disabled && "disabled"}`} onClick={() => setShow(!show)}>
             Edit
           </button>
           <button
-            className="btn"
+            className={`btn ${disabled && "disabled"}`}
             onClick={() => {
               deleteTransaction(transaction.id);
             }}

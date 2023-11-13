@@ -13,3 +13,8 @@
     height: calc(100vh - 15rem);
     overflow-y: auto;
 }
+
+.disabled {
+    opacity: .2;
+    pointer-events: none;
+}

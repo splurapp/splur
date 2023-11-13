@@ -40,7 +40,12 @@ export default function Transactions({ wallet }: Props) {
                 <div key={index}>
                   {item.timestamp.toTimeString()} - {item.exchangeType} - {item.amount}
                   {" ----> "}
-                  <EditTransaction transaction={item} refreshTransactions={refreshTransactions} />
+                  <EditTransaction
+                    wallet={wallet}
+                    transaction={item}
+                    refreshTransactions={refreshTransactions}
+                    disabled={wallet.id === item.transferTo}
+                  />
                 </div>
                 <hr></hr>
               </div>
