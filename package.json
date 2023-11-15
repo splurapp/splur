@@ -10,6 +10,7 @@
     "format": "prettier . --write"
   },
   "dependencies": {
+    "@yudiel/react-qr-scanner": "^1.2.0",
     "dexie": "^3.2.4",
     "dexie-react-hooks": "^1.1.6",
     "react": "^18.2.0",
