@@ -8,11 +8,11 @@ import Settings from "./Settings";
 import Track from "./Track";
 import Accounts from "./accounts";
 import NewAccount from "./accounts/new";
+import Dev from "./dev/Dev";
 import AccountSetup from "./setup/AccountSetup";
 import Hello from "./setup/Hello";
-import Welcome from "./setup/Welcome";
 import SetupLayout from "./setup/SetupLayout";
-import Dev from "./dev/Dev";
+import Welcome from "./setup/Welcome";
 
 export const router = createBrowserRouter([
   {
