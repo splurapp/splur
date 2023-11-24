@@ -1,5 +1,5 @@
 import { IndexableType, IndexableTypeArray } from "dexie";
-import db, { Wallet, SplurTransaction, ExchangeType } from "./db";
+import db, { ExchangeType, SplurTransaction, Wallet } from "./db";
 import { TransactionOperations } from "./transactionOps";
 
 export class WalletOperations {
@@ -13,7 +13,7 @@ export class WalletOperations {
     return await db.wallets.toArray();
   }
 
-  static async create(wallet: Wallet): Promise<boolean> {
+  static async create(wallet: Wallet): Promise<Wallet | null> {
     return await db.transaction("rw", db.wallets, db.splurTransactions, async () => {
       try {
         const newWallet: Wallet = {
@@ -41,9 +41,11 @@ export class WalletOperations {
           await TransactionOperations.add(newTransaction);
         }
 
-        return true;
+        newWallet.id = walletId;
+        return newWallet;
       } catch (error) {
-        return false;
+        console.log(error);
+        return null;
       }
     });
   }
@@ -91,6 +93,7 @@ export class WalletOperations {
   }
 
   static async edit(wallet: Wallet): Promise<boolean> {
+    // TODO: return updated wallet, instead of boolean
     return await db.transaction("rw", db.wallets, db.splurTransactions, async () => {
       try {
         const currWallet = await db.wallets.get(wallet.id as IndexableType);
