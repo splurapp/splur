@@ -13,7 +13,6 @@ import Dev from "./dev/Dev";
 import AccountSetup from "./setup/AccountSetup";
 import Hello from "./setup/Hello";
 import SetupLayout from "./setup/SetupLayout";
-import Welcome from "./setup/Welcome";
 
 export const router = createBrowserRouter([
   {
@@ -42,10 +41,6 @@ export const router = createBrowserRouter([
           {
             path: "account",
             element: <AccountSetup />,
-          },
-          {
-            path: "welcome",
-            element: <Welcome />,
           },
         ],
       },
