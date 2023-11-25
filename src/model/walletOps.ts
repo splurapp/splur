@@ -50,7 +50,7 @@ export class WalletOperations {
     });
   }
 
-  static async remove(id: number): Promise<boolean> {
+  static async remove(id: number): Promise<number | null> {
     return await db.transaction("rw", db.wallets, db.splurTransactions, async () => {
       try {
         const ret = await db.wallets.where("id").equals(id).delete();
@@ -76,23 +76,23 @@ export class WalletOperations {
               await db.splurTransactions.bulkDelete(
                 uselessTransactions.map(transaction => transaction.id) as IndexableTypeArray,
               );
-              return true;
+              return id;
             } catch (error) {
               console.log(error);
-              return false;
+              return null;
             }
           });
         }
 
-        return true;
+        return id;
       } catch (error) {
         console.log(error);
-        return false;
+        return null;
       }
     });
   }
 
-  static async edit(wallet: Wallet): Promise<boolean> {
+  static async edit(wallet: Wallet): Promise<Wallet | null> {
     // TODO: return updated wallet, instead of boolean
     return await db.transaction("rw", db.wallets, db.splurTransactions, async () => {
       try {
@@ -126,9 +126,13 @@ export class WalletOperations {
           await TransactionOperations.add(newTransaction);
         }
 
-        return ret === 1 ? true : false;
-      } catch {
-        return false;
+        // Gets the wallet
+        const updatedWallet = await db.wallets.get(wallet.id as IndexableType);
+
+        return ret === 1 && updatedWallet ? updatedWallet : null;
+      } catch (error) {
+        console.log(error);
+        return null;
       }
     });
   }
