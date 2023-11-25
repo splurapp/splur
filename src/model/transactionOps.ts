@@ -1,5 +1,5 @@
 import { IndexableType } from "dexie";
-import db, { SplurTransaction, ExchangeType, Wallet } from "./db";
+import db, { SplurTransaction, ExchangeType } from "./db";
 import { WalletOperations } from "./walletOps";
 
 export class TransactionOperations {
@@ -98,6 +98,12 @@ export class TransactionOperations {
   static async add(transaction: SplurTransaction): Promise<boolean> {
     return await db.transaction("rw", db.splurTransactions, db.wallets, async () => {
       try {
+        if (LoanOperations.isLoan(transaction)) {
+          throw new Error(
+            "This Exchange type is not allowed for this operation. Please use LoanOperations methods.",
+          );
+        }
+
         if (transaction.autoCategoryMap) {
           // Need to call mapper to get associated category
           // WIP
@@ -119,6 +125,12 @@ export class TransactionOperations {
     return await db.transaction("rw", db.splurTransactions, db.wallets, async () => {
       try {
         for (let transaction of transactions) {
+          if (LoanOperations.isLoan(transaction)) {
+            throw new Error(
+              "This Exchange type is not allowed for this operation. Please use LoanOperations methods.",
+            );
+          }
+
           if (transaction.autoCategoryMap) {
             // Need to call mapper to get associated category
             // Need to find effective solution for this
@@ -142,6 +154,12 @@ export class TransactionOperations {
   static async edit(transaction: SplurTransaction): Promise<boolean> {
     return await db.transaction("rw", db.splurTransactions, db.wallets, async () => {
       try {
+        if (LoanOperations.isLoan(transaction)) {
+          throw new Error(
+            "This Exchange type is not allowed for this operation. Please use LoanOperations methods.",
+          );
+        }
+
         if (transaction.autoCategoryMap) {
           // Need to call mapper to get associated category
           // WIP
@@ -174,12 +192,15 @@ export class TransactionOperations {
     return await db.transaction("rw", db.splurTransactions, db.wallets, async () => {
       try {
         const transaction = await db.splurTransactions.get(id);
-        if (transaction) {
+        if (!transaction) throw new Error("Transaction doesn't exists");
+
+        if (LoanOperations.isLoan(transaction)) {
+          await db.splurTransactions.update(id, { assignedTo: undefined });
+        } else {
           await db.splurTransactions.delete(id);
-          return await WalletOperations.sync(transaction, true);
         }
 
-        return true;
+        return await WalletOperations.sync(transaction, true);
       } catch {
         return false;
       }
@@ -196,9 +217,248 @@ export class TransactionOperations {
           if (transaction) await WalletOperations.sync(transaction, true);
         }
 
-        await db.splurTransactions.bulkDelete(ids);
+        // Not deleting any transaction records when its loan
+        const transactionIdsWithoutLoan: number[] = [];
+        const transactionIdsWithLoan: SplurTransaction[] = [];
+        for (let transaction of transactions) {
+          if (transaction !== undefined && transaction.id) {
+            if (LoanOperations.isLoan(transaction)) {
+              transaction.assignedTo = undefined;
+              transactionIdsWithLoan.push(transaction);
+            } else {
+              transactionIdsWithoutLoan.push(transaction.id);
+            }
+          }
+        }
+
+        // Removing assigned to from those ids which have loan
+        await db.splurTransactions.bulkPut(transactionIdsWithLoan);
+
+        await db.splurTransactions.bulkDelete(transactionIdsWithoutLoan);
         return true;
       } catch {
+        return false;
+      }
+    });
+  }
+}
+
+export class LoanOperations {
+  static isLoan(transaction: SplurTransaction): Boolean {
+    return [
+      ExchangeType.BORROW,
+      ExchangeType.SUB_BORROW,
+      ExchangeType.LEND,
+      ExchangeType.SUB_LEND,
+    ].includes(transaction.exchangeType);
+  }
+
+  static async get(parentId?: number): Promise<SplurTransaction[]> {
+    if (parentId) {
+      return await db.splurTransactions.where("loanId").equals(parentId).toArray();
+    }
+
+    return await db.splurTransactions.filter(item => item.loanId !== undefined).toArray();
+  }
+
+  // Only for Parent loan obj
+  static async create(transaction: SplurTransaction): Promise<Boolean> {
+    return await db.transaction("rw", db.splurTransactions, db.wallets, async () => {
+      try {
+        if (
+          transaction.exchangeType !== ExchangeType.BORROW &&
+          transaction.exchangeType !== ExchangeType.LEND
+        ) {
+          throw new Error("Only Borrow and Lend transaction allowed for this operation");
+        }
+
+        const objIndex = await db.splurTransactions.add(transaction);
+        await db.splurTransactions.update(objIndex, { loanId: objIndex });
+
+        // Sync wallet
+        if (transaction.assignedTo) {
+          return await WalletOperations.sync(transaction);
+        }
+
+        return true;
+      } catch (error) {
+        console.log(error);
+        return false;
+      }
+    });
+  }
+
+  static async addChild(transaction: SplurTransaction, parentId: number): Promise<Boolean> {
+    return await db.transaction("rw", db.splurTransactions, db.wallets, async () => {
+      try {
+        const parent = await TransactionOperations.getById(parentId);
+        if (!parent) throw new Error("Parent doesn't exists");
+
+        if (
+          parent.exchangeType !== ExchangeType.BORROW &&
+          parent.exchangeType !== ExchangeType.LEND
+        ) {
+          throw new Error("Only Borrow and Lend parent transaction allowed for this operation");
+        }
+
+        if (
+          (parent.exchangeType === ExchangeType.BORROW &&
+            transaction.exchangeType !== ExchangeType.SUB_BORROW) ||
+          (parent.exchangeType === ExchangeType.LEND &&
+            transaction.exchangeType !== ExchangeType.SUB_LEND)
+        ) {
+          throw new Error(
+            `Parent [${parent.exchangeType}] & Child [${transaction.exchangeType}] exchange type is not matching`,
+          );
+        }
+
+        if (transaction.assignedTo) {
+          // Validate if assigned to Really exists in DB
+          const wallet = await WalletOperations.getById(transaction.assignedTo);
+
+          if (!wallet) throw new Error("Assigned wallet id doesn't exists");
+        }
+
+        transaction.loanId = parentId;
+        await db.splurTransactions.add(transaction);
+
+        if (transaction.assignedTo) {
+          return await WalletOperations.sync(transaction);
+        }
+
+        return true;
+      } catch (error) {
+        console.log(error);
+        return false;
+      }
+    });
+  }
+
+  // We can only able to edit (Show Hide transaction & Amount)
+  static async edit(transaction: SplurTransaction): Promise<Boolean> {
+    return await db.transaction("rw", db.splurTransactions, db.wallets, async () => {
+      try {
+        if (!transaction.id) return false;
+
+        // Fetch previous version of transaction so that we can use it to revert back those amounts from wallet.
+        const prevTransaction = await TransactionOperations.getById(transaction.id);
+
+        const ret = await db.splurTransactions.update(transaction.id, {
+          assignedTo: transaction.assignedTo,
+          amount: transaction.amount,
+        });
+
+        // Syncing wallet
+        if (ret === 1 && prevTransaction) {
+          if (prevTransaction.assignedTo) {
+            // Popped previous transaction
+            await WalletOperations.sync(prevTransaction, true);
+          }
+
+          if (transaction.assignedTo) {
+            // Synced new modified transaction
+            return await WalletOperations.sync(transaction);
+          }
+
+          return true;
+        }
+
+        return false;
+      } catch (error) {
+        console.log(error);
+        return false;
+      }
+    });
+  }
+
+  // Destroy a particular loan (Including childs)
+  static async destroy(parentId: number): Promise<Boolean> {
+    return await db.transaction("rw", db.splurTransactions, db.wallets, async () => {
+      try {
+        const loanTransactions = await LoanOperations.get(parentId);
+
+        // Reverting wallet changes whatever parent or child is associated with wallet
+        for (const transaction of loanTransactions) {
+          if (transaction.assignedTo) {
+            await WalletOperations.sync(transaction, true);
+          }
+        }
+
+        const ret = await db.splurTransactions.where("loanId").equals(parentId).delete();
+        if (ret !== loanTransactions.length) {
+          throw new Error("Not all the records are deleted.");
+        }
+
+        return true;
+      } catch (error) {
+        console.log(error);
+        return false;
+      }
+    });
+  }
+
+  // Delete child
+  static async deleteChild(childId: number): Promise<Boolean> {
+    return await db.transaction("rw", db.splurTransactions, db.wallets, async () => {
+      try {
+        const childTransaction = await TransactionOperations.getById(childId);
+
+        if (!childTransaction) throw new Error("Provided child id not exists");
+
+        // Check exchange type and parent
+        if (childTransaction.id === childTransaction.loanId) {
+          throw new Error("Parent loan transaction not allowed for this operation");
+        }
+
+        if (
+          ![ExchangeType.SUB_BORROW, ExchangeType.SUB_LEND].includes(childTransaction.exchangeType)
+        ) {
+          throw new Error("Other exchange types are not allowed for this operation");
+        }
+
+        // Revert wallet changes
+        if (childTransaction.assignedTo) {
+          await WalletOperations.sync(childTransaction, true);
+        }
+
+        await db.splurTransactions.delete(childId);
+        return true;
+      } catch (error) {
+        console.log(error);
+        return false;
+      }
+    });
+  }
+
+  // It will only delete from wallet (transaction existence will be there)
+  static async deleteFromWallet(transactionId: number): Promise<Boolean> {
+    return await db.transaction("rw", db.splurTransactions, db.wallets, async () => {
+      try {
+        const transaction = await TransactionOperations.getById(transactionId);
+
+        if (!transaction) throw new Error("Provided transaction id not exists");
+
+        if (
+          ![
+            ExchangeType.BORROW,
+            ExchangeType.SUB_BORROW,
+            ExchangeType.LEND,
+            ExchangeType.SUB_LEND,
+          ].includes(transaction.exchangeType)
+        ) {
+          throw new Error("Other exchange types are not allowed for this operation");
+        }
+
+        // Revert wallet changes
+        if (transaction.assignedTo) {
+          await WalletOperations.sync(transaction, true);
+        }
+
+        await db.splurTransactions.update(transactionId, { assignedTo: undefined });
+
+        return true;
+      } catch (error) {
+        console.log(error);
         return false;
       }
     });
