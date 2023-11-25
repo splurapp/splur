@@ -1,5 +1,6 @@
+import { APP_NAME } from "@/appConstants";
 import Layout from "@/layout";
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, redirect } from "react-router-dom";
 import About from "./About";
 import Borrowing from "./Borrowing";
 import Home from "./Home";
@@ -26,6 +27,13 @@ export const router = createBrowserRouter([
       {
         path: "setup",
         element: <SetupLayout />,
+        loader: async () => {
+          const isSetupCompleted = localStorage.getItem(APP_NAME + "__initialSetupCompleted");
+          if (JSON.parse(isSetupCompleted ?? "false")) {
+            return redirect("/");
+          }
+          return null;
+        },
         children: [
           {
             index: true,

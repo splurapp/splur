@@ -1,6 +1,8 @@
+import { APP_NAME } from "@/appConstants";
 import { Wallet, WalletType } from "@/model/db";
 import { WalletOperations } from "@/model/walletOps";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 type EditWalletModalProps = {
   wallet: Wallet;
@@ -93,6 +95,7 @@ const DEFAULT_WALLETS: Wallet[] = [
 ];
 
 export default function AccountSetup() {
+  const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [wallets, setWallets] = useState<Wallet[]>([]);
   const [defaultWallets, setDefaultWallets] = useState<Wallet[] | null>(null);
@@ -118,6 +121,11 @@ export default function AccountSetup() {
     ); // TODO: use returned updated wallet to replace
     setCurrentWallet(null);
     setIsModalOpen(false);
+  }
+
+  function completeSetup() {
+    localStorage.setItem(APP_NAME + "__initialSetupCompleted", "true");
+    navigate("/");
   }
 
   useEffect(() => {
@@ -151,7 +159,7 @@ export default function AccountSetup() {
 
         {!!defaultWallets?.length && (
           <>
-            <h1 className="text-xl">Suggestions</h1>
+            <h1 className="text-lg">Suggestions</h1>
             <div className="flex flex-row flex-wrap gap-3">
               {defaultWallets.map(wallet => (
                 <button
@@ -179,7 +187,9 @@ export default function AccountSetup() {
       </section>
 
       <section className="mt-auto join join-vertical">
-        <button className="btn btn-primary w-full join-item">Next</button>
+        <button onClick={completeSetup} className="btn btn-primary w-full join-item">
+          Complete
+        </button>
       </section>
     </main>
   );
