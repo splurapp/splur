@@ -108,7 +108,7 @@ export class MySubClassedDexie extends Dexie {
   importStatementConfigs!: Table<ImportStatementConfig>;
 
   constructor() {
-    super("sontosh");
+    super("splur");
     this.version(1).stores({
       wallets: "++id, &name",
       user: "&name",

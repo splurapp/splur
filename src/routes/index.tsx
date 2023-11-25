@@ -1,5 +1,6 @@
+import { APP_NAME } from "@/appConstants";
 import Layout from "@/layout";
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, redirect } from "react-router-dom";
 import About from "./About";
 import Borrowing from "./Borrowing";
 import Home from "./Home";
@@ -8,11 +9,10 @@ import Settings from "./Settings";
 import Track from "./Track";
 import Accounts from "./accounts";
 import NewAccount from "./accounts/new";
+import Dev from "./dev/Dev";
 import AccountSetup from "./setup/AccountSetup";
 import Hello from "./setup/Hello";
-import Welcome from "./setup/Welcome";
 import SetupLayout from "./setup/SetupLayout";
-import Dev from "./dev/Dev";
 
 export const router = createBrowserRouter([
   {
@@ -26,6 +26,13 @@ export const router = createBrowserRouter([
       {
         path: "setup",
         element: <SetupLayout />,
+        loader: async () => {
+          const isSetupCompleted = localStorage.getItem(APP_NAME + "__initialSetupCompleted");
+          if (JSON.parse(isSetupCompleted ?? "false")) {
+            return redirect("/");
+          }
+          return null;
+        },
         children: [
           {
             index: true,
@@ -34,10 +41,6 @@ export const router = createBrowserRouter([
           {
             path: "account",
             element: <AccountSetup />,
-          },
-          {
-            path: "welcome",
-            element: <Welcome />,
           },
         ],
       },

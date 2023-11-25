@@ -8,7 +8,7 @@ export default function Hello() {
       <h1 className="text-5xl font-bold italic text-primary-content">Splur.</h1>
       <p className="text-secondary-content text-sm">An open source personal expense manager app</p>
       <Link to="account">
-        <button className="btn btn-secondary btn-wide mt-5">Let's Go</button>
+        <button className="btn btn-accent btn-wide mt-5">Let's Go</button>
       </Link>
     </main>
   );
