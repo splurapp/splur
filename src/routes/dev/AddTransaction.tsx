@@ -76,7 +76,7 @@ export default function AddTransaction({ wallet, refreshTransactions }: Props) {
       autoCategoryMap: true,
       category: "other",
       subcategory: "other",
-      dismissed: undefined,
+      // dismissed: undefined,
       exchanger: undefined,
       exchangeType: exchangeType,
       transferFrom: undefined,

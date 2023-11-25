@@ -31,7 +31,7 @@ export class WalletOperations {
             autoCategoryMap: false,
             category: "other",
             subcategory: "other",
-            dismissed: undefined,
+            // dismissed: undefined,
             exchanger: undefined,
             exchangeType: ExchangeType.CREDIT,
             transferFrom: undefined,
@@ -112,7 +112,7 @@ export class WalletOperations {
             autoCategoryMap: false,
             category: "other",
             subcategory: "other",
-            dismissed: undefined,
+            // dismissed: undefined,
             exchanger: undefined,
             exchangeType:
               wallet.amount > currWallet.amount ? ExchangeType.CREDIT : ExchangeType.DEBIT,
@@ -139,6 +139,7 @@ export class WalletOperations {
           if (currWallet) {
             if (
               transaction.exchangeType === ExchangeType.BORROW ||
+              transaction.exchangeType === ExchangeType.SUB_LEND ||
               transaction.exchangeType === ExchangeType.CREDIT
             ) {
               currWallet.amount = revert
@@ -146,6 +147,7 @@ export class WalletOperations {
                 : currWallet.amount + transaction.amount;
             } else if (
               transaction.exchangeType === ExchangeType.LEND ||
+              transaction.exchangeType === ExchangeType.SUB_BORROW ||
               transaction.exchangeType === ExchangeType.DEBIT
             ) {
               currWallet.amount = revert
@@ -156,9 +158,9 @@ export class WalletOperations {
             await db.wallets.update(currWallet.id as IndexableType, {
               amount: currWallet.amount,
             });
-            return true;
           }
-          return false;
+
+          return true;
         } else {
           const transferFrom = await WalletOperations.getById(transaction.transferFrom);
           const transferTo = await WalletOperations.getById(transaction.transferTo);
