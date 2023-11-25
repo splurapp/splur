@@ -6,7 +6,9 @@ export enum ExchangeType {
   DEBIT = "DR",
   TRANSFER = "TRF",
   LEND = "LND",
+  SUB_LEND = "SLND",
   BORROW = "BRW",
+  SUB_BORROW = "SBRW",
 }
 
 export enum Currency {
@@ -34,18 +36,31 @@ export interface Wallet {
 
 export interface SplurTransaction {
   id?: number;
-  assignedTo: number; // WALLET ID (Ex. Cash Wallet, Bank Wallet)
+  assignedTo?: number; // WALLET ID (Ex. Cash Wallet, Bank Wallet)
   timestamp: Date;
   amount: number;
-  exchanger: string | undefined; // Person, UPI ID, BANK ACCOUNT One Liner Details, Mobile Number
+  exchanger?: string; // Person, UPI ID, BANK ACCOUNT One Liner Details, Mobile Number
   exchangeType: ExchangeType; // Credit, Debit, Transfer, Borrow, Lend
-  transferFrom: number | undefined; // WALLET ID (Ex. Cash Wallet, Bank Wallet)
-  transferTo: number | undefined; // WALLET ID (Ex. Cash Wallet, Bank Wallet)
-  dismissed: boolean | undefined; // Used for Lend OR BORROW
-  category: string;
-  subcategory: string | undefined;
+  transferFrom?: number; // WALLET ID (Ex. Cash Wallet, Bank Wallet)
+  transferTo?: number; // WALLET ID (Ex. Cash Wallet, Bank Wallet)
+  // dismissed?: boolean; // Used for Lend OR BORROW
+  category?: string;
+  subcategory?: string;
   autoCategoryMap: boolean | true; // For marchant to Category or Sub Category Mapping
+  recurringId?: any; // To identify recurring transaction
+  loanId?: any; // To identify loan transaction
 }
+
+// export interface Loan {
+//   id?: number;
+//   timestamp: Date;
+//   amount: number;
+//   exchangeType: ExchangeType; // Borrow, Lend, Sub Borrow, Sub Lend
+//   recurring_id?: any; // To identify recurring transaction
+//   assignedTo?: number;
+//   transaction_exists: boolean | true;
+//   parent_id?: any; // To identify parent of current transaction
+// }
 
 export interface Preferences {
   id?: number;
@@ -87,6 +102,7 @@ export class MySubClassedDexie extends Dexie {
   user!: Table<User>;
   wallets!: Table<Wallet>;
   splurTransactions!: Table<SplurTransaction>;
+  // loans!: Table<Loan>;
   preferences!: Table<Preferences>;
   categoryMaps!: Table<CategoryMap>;
   importStatementConfigs!: Table<ImportStatementConfig>;
@@ -96,7 +112,8 @@ export class MySubClassedDexie extends Dexie {
     this.version(1).stores({
       wallets: "++id, &name",
       user: "&name",
-      splurTransactions: "++id, timestamp, assignedTo, transferFrom",
+      splurTransactions: "++id, timestamp, assignedTo, transferFrom, loanId",
+      // loans: "++id, timestamp, exchangeType, parent_id",
       preferences: "id",
       categoryMaps: "++id",
       importStatementConfigs: "&name",
