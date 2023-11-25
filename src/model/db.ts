@@ -107,8 +107,8 @@ export class MySubClassedDexie extends Dexie {
   categoryMaps!: Table<CategoryMap>;
   importStatementConfigs!: Table<ImportStatementConfig>;
 
-  constructor() {
-    super("splur");
+  constructor(databaseName?: string) {
+    super(databaseName || "splur");
     this.version(1).stores({
       wallets: "++id, &name",
       user: "&name",
