@@ -95,7 +95,7 @@ export class TransactionOperations {
       .toArray();
   }
 
-  static async add(transaction: SplurTransaction): Promise<boolean> {
+  static async add(transaction: SplurTransaction): Promise<SplurTransaction | null> {
     return await db.transaction("rw", db.splurTransactions, db.wallets, async () => {
       try {
         if (LoanOperations.isLoan(transaction)) {
@@ -109,14 +109,19 @@ export class TransactionOperations {
           // WIP
         }
 
-        await db.splurTransactions.add(transaction);
+        const newTransactionId = await db.splurTransactions.add(transaction);
 
         // Sync wallet
         await WalletOperations.sync(transaction);
-        return true;
+
+        // Get the transaction object
+        if (!newTransactionId) throw new Error("Transaction creation failed");
+
+        const newTransaction = await TransactionOperations.getById(newTransactionId as number);
+        return newTransaction ? newTransaction : null;
       } catch (error) {
         console.log(error);
-        return false;
+        return null;
       }
     });
   }
@@ -151,7 +156,7 @@ export class TransactionOperations {
     });
   }
 
-  static async edit(transaction: SplurTransaction): Promise<boolean> {
+  static async edit(transaction: SplurTransaction): Promise<SplurTransaction | null> {
     return await db.transaction("rw", db.splurTransactions, db.wallets, async () => {
       try {
         if (LoanOperations.isLoan(transaction)) {
@@ -165,7 +170,7 @@ export class TransactionOperations {
           // WIP
         }
 
-        if (!transaction.id) return false;
+        if (!transaction.id) return null;
 
         // Fetch previous version of transaction so that we can use it to revert back those amounts from wallet.
         const prevTransaction = await TransactionOperations.getById(transaction.id);
@@ -178,17 +183,22 @@ export class TransactionOperations {
           await WalletOperations.sync(prevTransaction, true);
 
           // Synced new modified transaction
-          return await WalletOperations.sync(transaction);
+          await WalletOperations.sync(transaction);
+
+          // Gets updated transaction
+          const updatedTransaction = await TransactionOperations.getById(transaction.id);
+          return updatedTransaction ? updatedTransaction : null;
         }
 
-        return false;
-      } catch {
-        return false;
+        throw new Error("Transaction update failed");
+      } catch (error) {
+        console.log(error);
+        return null;
       }
     });
   }
 
-  static async delete(id: number): Promise<boolean> {
+  static async delete(id: number): Promise<number | null> {
     return await db.transaction("rw", db.splurTransactions, db.wallets, async () => {
       try {
         const transaction = await db.splurTransactions.get(id);
@@ -200,9 +210,11 @@ export class TransactionOperations {
           await db.splurTransactions.delete(id);
         }
 
-        return await WalletOperations.sync(transaction, true);
-      } catch {
-        return false;
+        await WalletOperations.sync(transaction, true);
+        return id;
+      } catch (error) {
+        console.log(error);
+        return null;
       }
     });
   }
@@ -262,7 +274,7 @@ export class LoanOperations {
   }
 
   // Only for Parent loan obj
-  static async create(transaction: SplurTransaction): Promise<Boolean> {
+  static async create(transaction: SplurTransaction): Promise<SplurTransaction | null> {
     return await db.transaction("rw", db.splurTransactions, db.wallets, async () => {
       try {
         if (
@@ -274,21 +286,27 @@ export class LoanOperations {
 
         const objIndex = await db.splurTransactions.add(transaction);
         await db.splurTransactions.update(objIndex, { loanId: objIndex });
+        if (!objIndex) throw new Error("Transaction creation failed");
 
         // Sync wallet
         if (transaction.assignedTo) {
-          return await WalletOperations.sync(transaction);
+          await WalletOperations.sync(transaction);
         }
 
-        return true;
+        // Gets transaction
+        const newTransaction = await TransactionOperations.getById(objIndex as number);
+        return newTransaction ? newTransaction : null;
       } catch (error) {
         console.log(error);
-        return false;
+        return null;
       }
     });
   }
 
-  static async addChild(transaction: SplurTransaction, parentId: number): Promise<Boolean> {
+  static async addChild(
+    transaction: SplurTransaction,
+    parentId: number,
+  ): Promise<SplurTransaction | null> {
     return await db.transaction("rw", db.splurTransactions, db.wallets, async () => {
       try {
         const parent = await TransactionOperations.getById(parentId);
@@ -320,25 +338,28 @@ export class LoanOperations {
         }
 
         transaction.loanId = parentId;
-        await db.splurTransactions.add(transaction);
+        const transactionId = await db.splurTransactions.add(transaction);
+        if (!transactionId) throw new Error("Transaction creation failed");
 
         if (transaction.assignedTo) {
-          return await WalletOperations.sync(transaction);
+          await WalletOperations.sync(transaction);
         }
 
-        return true;
+        // Gets transaction
+        const newTransaction = await TransactionOperations.getById(transactionId as number);
+        return newTransaction ? newTransaction : null;
       } catch (error) {
         console.log(error);
-        return false;
+        return null;
       }
     });
   }
 
   // We can only able to edit (Show Hide transaction & Amount)
-  static async edit(transaction: SplurTransaction): Promise<Boolean> {
+  static async edit(transaction: SplurTransaction): Promise<SplurTransaction | null> {
     return await db.transaction("rw", db.splurTransactions, db.wallets, async () => {
       try {
-        if (!transaction.id) return false;
+        if (!transaction.id) return null;
 
         // Fetch previous version of transaction so that we can use it to revert back those amounts from wallet.
         const prevTransaction = await TransactionOperations.getById(transaction.id);
@@ -357,22 +378,24 @@ export class LoanOperations {
 
           if (transaction.assignedTo) {
             // Synced new modified transaction
-            return await WalletOperations.sync(transaction);
+            await WalletOperations.sync(transaction);
           }
 
-          return true;
+          // Gets updated transaction
+          const updatedTransaction = await TransactionOperations.getById(transaction.id);
+          return updatedTransaction ? updatedTransaction : null;
         }
 
-        return false;
+        throw new Error("Transaction update failed.");
       } catch (error) {
         console.log(error);
-        return false;
+        return null;
       }
     });
   }
 
   // Destroy a particular loan (Including childs)
-  static async destroy(parentId: number): Promise<Boolean> {
+  static async destroy(parentId: number): Promise<number | null> {
     return await db.transaction("rw", db.splurTransactions, db.wallets, async () => {
       try {
         const loanTransactions = await LoanOperations.get(parentId);
@@ -389,16 +412,16 @@ export class LoanOperations {
           throw new Error("Not all the records are deleted.");
         }
 
-        return true;
+        return parentId;
       } catch (error) {
         console.log(error);
-        return false;
+        return null;
       }
     });
   }
 
   // Delete child
-  static async deleteChild(childId: number): Promise<Boolean> {
+  static async deleteChild(childId: number): Promise<number | null> {
     return await db.transaction("rw", db.splurTransactions, db.wallets, async () => {
       try {
         const childTransaction = await TransactionOperations.getById(childId);
@@ -422,16 +445,16 @@ export class LoanOperations {
         }
 
         await db.splurTransactions.delete(childId);
-        return true;
+        return childId;
       } catch (error) {
         console.log(error);
-        return false;
+        return null;
       }
     });
   }
 
   // It will only delete from wallet (transaction existence will be there)
-  static async deleteFromWallet(transactionId: number): Promise<Boolean> {
+  static async deleteFromWallet(transactionId: number): Promise<number | null> {
     return await db.transaction("rw", db.splurTransactions, db.wallets, async () => {
       try {
         const transaction = await TransactionOperations.getById(transactionId);
@@ -456,10 +479,10 @@ export class LoanOperations {
 
         await db.splurTransactions.update(transactionId, { assignedTo: undefined });
 
-        return true;
+        return transactionId;
       } catch (error) {
         console.log(error);
-        return false;
+        return null;
       }
     });
   }
