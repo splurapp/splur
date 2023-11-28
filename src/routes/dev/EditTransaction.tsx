@@ -93,6 +93,16 @@ export default function EditTransaction({
         exchangeType: exchangeType,
       };
 
+      const currExchangeType = exchangeType as ExchangeType;
+      if (
+        transaction.exchangeType === ExchangeType.TRANSFER &&
+        currExchangeType !== ExchangeType.TRANSFER
+      ) {
+        myNewTransaction.assignedTo = transaction.transferFrom;
+      }
+
+      console.log(myNewTransaction);
+
       await TransactionOperations.edit(myNewTransaction);
     } else {
       const myNewTransaction: SplurTransaction = {
