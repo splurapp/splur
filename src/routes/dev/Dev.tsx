@@ -3,6 +3,7 @@ import { Wallet, WalletType } from "@/model/db";
 import { WalletOperations } from "@/model/walletOps";
 import EditWallet from "./EditWallet";
 import Transactions from "./Transactions";
+import Loan from "./Loan";
 
 export default function Dev() {
   const [wallets, setWallets] = useState<Wallet[]>([]);
@@ -82,6 +83,7 @@ export default function Dev() {
       <button className="btn btn-primary" onClick={createWallet}>
         Create Wallet
       </button>
+      <Loan />
     </div>
   );
 }
