@@ -41,8 +41,9 @@ export class WalletOperations {
           await TransactionOperations.add(newTransaction);
         }
 
-        newWallet.id = walletId;
-        return newWallet;
+        // gets updated wallet
+        const updatedWallet = await WalletOperations.getById(walletId);
+        return updatedWallet;
       } catch (error) {
         console.log(error);
         return null;
