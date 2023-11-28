@@ -10,7 +10,9 @@ export default function Hello() {
       return;
     }
 
+    // @ts-ignore
     installEvent.current.prompt();
+    // @ts-ignore
     const result = await installEvent.current.userChoice;
     if (result.outcome === "accepted") {
       setIsModalOpen(false);
