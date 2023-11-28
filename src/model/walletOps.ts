@@ -41,8 +41,10 @@ export class WalletOperations {
           await TransactionOperations.add(newTransaction);
         }
 
-        newWallet.id = walletId;
-        return newWallet;
+        // gets updated wallet
+        if (!walletId) throw new Error("Wallet creation failed");
+        const updatedWallet = await WalletOperations.getById(walletId);
+        return updatedWallet ? updatedWallet : null;
       } catch (error) {
         console.log(error);
         return null;

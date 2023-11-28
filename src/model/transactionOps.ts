@@ -175,6 +175,15 @@ export class TransactionOperations {
         // Fetch previous version of transaction so that we can use it to revert back those amounts from wallet.
         const prevTransaction = await TransactionOperations.getById(transaction.id);
 
+        // Checking few of the things if prevTransaction is transfer and new transaction is not
+        if (
+          prevTransaction?.exchangeType === ExchangeType.TRANSFER &&
+          transaction.exchangeType !== ExchangeType.TRANSFER
+        ) {
+          transaction.transferFrom = undefined;
+          transaction.transferTo = undefined;
+        }
+
         const ret = await db.splurTransactions.update(transaction.id, transaction);
 
         // Syncing wallet
