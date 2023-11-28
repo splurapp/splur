@@ -1,5 +1,5 @@
-import { APP_NAME } from "@/appConstants";
 import Layout from "@/layout";
+import { isInitialSetupDone } from "@/lib/app";
 import { createBrowserRouter, redirect } from "react-router-dom";
 import About from "./About";
 import Borrowing from "./Borrowing";
@@ -22,13 +22,18 @@ export const router = createBrowserRouter([
       {
         index: true,
         element: <Home />,
+        loader: async () => {
+          if (!isInitialSetupDone()) {
+            return redirect("/setup");
+          }
+          return null;
+        },
       },
       {
         path: "setup",
         element: <SetupLayout />,
         loader: async () => {
-          const isSetupCompleted = localStorage.getItem(APP_NAME + "__initialSetupCompleted");
-          if (JSON.parse(isSetupCompleted ?? "false")) {
+          if (isInitialSetupDone()) {
             return redirect("/");
           }
           return null;
