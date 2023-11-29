@@ -25,6 +25,7 @@ function EditWalletModal({ isOpen, onSave, wallet, onClose }: EditWalletModalPro
             <span className="label-text">Name</span>
           </label>
           <input
+            autoFocus
             type="text"
             placeholder="your wallet name"
             className="input input-bordered input-primary"
@@ -46,6 +47,15 @@ function EditWalletModal({ isOpen, onSave, wallet, onClose }: EditWalletModalPro
           />
         </div>
 
+        <div className="modal-action">
+          <button
+            className="btn btn-primary w-full"
+            onClick={() => onSave({ ...wallet, amount: editedAmount, name: editedName })}
+          >
+            Save
+          </button>
+        </div>
+
         <button
           className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
           onClick={onClose}
@@ -57,15 +67,6 @@ function EditWalletModal({ isOpen, onSave, wallet, onClose }: EditWalletModalPro
             ></path>
           </svg>
         </button>
-
-        <div className="modal-action">
-          <button
-            className="btn btn-primary w-full"
-            onClick={() => onSave({ ...wallet, amount: editedAmount, name: editedName })}
-          >
-            Save
-          </button>
-        </div>
       </div>
     </dialog>
   );
