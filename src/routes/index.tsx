@@ -1,4 +1,3 @@
-import Layout from "@/layout";
 import { isInitialSetupDone } from "@/lib/app";
 import { createBrowserRouter, redirect } from "react-router-dom";
 import About from "./About";
@@ -12,12 +11,10 @@ import NewAccount from "./accounts/new";
 import Dev from "./dev/Dev";
 import AccountSetup from "./setup/AccountSetup";
 import Hello from "./setup/Hello";
-import SetupLayout from "./setup/SetupLayout";
 
 export const router = createBrowserRouter([
   {
     path: "/",
-    element: <Layout />,
     children: [
       {
         index: true,
@@ -31,7 +28,6 @@ export const router = createBrowserRouter([
       },
       {
         path: "setup",
-        element: <SetupLayout />,
         loader: async () => {
           if (isInitialSetupDone()) {
             return redirect("/");
