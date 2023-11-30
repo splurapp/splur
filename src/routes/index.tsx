@@ -9,7 +9,7 @@ import Track from "./Track";
 import Accounts from "./accounts";
 import NewAccount from "./accounts/new";
 import Dev from "./dev/Dev";
-import AccountSetup from "./setup/AccountSetup";
+import AccountSetup, { loader as walletLoader } from "./setup/AccountSetup";
 import Hello from "./setup/Hello";
 
 export const router = createBrowserRouter([
@@ -42,6 +42,7 @@ export const router = createBrowserRouter([
           {
             path: "account",
             element: <AccountSetup />,
+            loader: walletLoader,
           },
         ],
       },

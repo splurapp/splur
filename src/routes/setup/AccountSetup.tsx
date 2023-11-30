@@ -1,8 +1,9 @@
 import { APP_NAME } from "@/appConstants";
 import { Wallet, WalletType } from "@/model/db";
 import { WalletOperations } from "@/model/walletOps";
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { type AsyncReturnType } from "@/types/utils";
+import { useState } from "react";
+import { useLoaderData, useNavigate } from "react-router-dom";
 
 type EditWalletModalProps = {
   wallet: Wallet;
@@ -75,7 +76,7 @@ function EditWalletModal({ isOpen, onSave, wallet, onClose }: EditWalletModalPro
 function WalletCard({ wallet, onEdit }: { wallet: Wallet; onEdit: (wallet: Wallet) => void }) {
   return (
     <>
-      <div className="card card-compact text-primary-content bg-primary join-item">
+      <div className="card text-primary-content bg-primary join-item">
         <div className="card-body flex-row justify-between">
           <div>
             <h2 className="card-title">{wallet.name}</h2>
@@ -113,11 +114,25 @@ const DEFAULT_WALLETS: Wallet[] = [
   },
 ];
 
+export async function loader() {
+  let defaultWallets: Wallet[] = DEFAULT_WALLETS;
+  const wallets = await WalletOperations.get();
+
+  if (wallets.length > 0) {
+    defaultWallets = defaultWallets.filter(
+      defaultWallet => wallets.findIndex(wallet => wallet.name === defaultWallet.name) == -1,
+    );
+  }
+
+  return { wallets, defaultWallets };
+}
+
 export default function AccountSetup() {
   const navigate = useNavigate();
+  const loaderData = useLoaderData() as AsyncReturnType<typeof loader>;
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [wallets, setWallets] = useState<Wallet[]>([]);
-  const [defaultWallets, setDefaultWallets] = useState<Wallet[] | null>(null);
+  const [wallets, setWallets] = useState<Wallet[]>(loaderData.wallets);
+  const [defaultWallets, setDefaultWallets] = useState<Wallet[]>(loaderData.defaultWallets);
   const [currentWallet, setCurrentWallet] = useState<Wallet | null>(null);
 
   async function createWallet(newWallet: Wallet) {
@@ -146,18 +161,6 @@ export default function AccountSetup() {
     localStorage.setItem(APP_NAME + "__initialSetupCompleted", "true");
     navigate("/");
   }
-
-  useEffect(() => {
-    (async () => {
-      const wallets = await WalletOperations.get();
-      if (!!wallets?.length) {
-        setWallets(wallets);
-        setDefaultWallets(null);
-      } else {
-        setDefaultWallets(DEFAULT_WALLETS);
-      }
-    })();
-  }, []);
 
   return (
     <main className="flex flex-col gap-5 px-5 py-6 h-[100dvh]">
