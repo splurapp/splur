@@ -15,25 +15,23 @@ import Hello from "./setup/Hello";
 export const router = createBrowserRouter([
   {
     path: "/",
+    loader: async ({ request }) => {
+      const isSetupDone = isInitialSetupDone();
+      if (request.url.includes("/setup")) {
+        return isSetupDone ? redirect("/") : null;
+      } else if (!isSetupDone) {
+        return redirect("/setup");
+      } else {
+        return null;
+      }
+    },
     children: [
       {
         index: true,
         element: <Home />,
-        loader: async () => {
-          if (!isInitialSetupDone()) {
-            return redirect("/setup");
-          }
-          return null;
-        },
       },
       {
         path: "setup",
-        loader: async () => {
-          if (isInitialSetupDone()) {
-            return redirect("/");
-          }
-          return null;
-        },
         children: [
           {
             index: true,
@@ -79,10 +77,10 @@ export const router = createBrowserRouter([
         path: "about",
         element: <About />,
       },
-      {
-        path: "dev",
-        element: <Dev />,
-      },
     ],
+  },
+  {
+    path: "dev",
+    element: <Dev />,
   },
 ]);
