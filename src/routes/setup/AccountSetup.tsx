@@ -58,7 +58,7 @@ function EditWalletModal({ isOpen, onSave, wallet, onClose }: EditWalletModalPro
         </div>
 
         <button
-          className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+          className="btn btn-circle btn-ghost btn-sm absolute right-2 top-2"
           onClick={onClose}
         >
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
@@ -76,7 +76,7 @@ function EditWalletModal({ isOpen, onSave, wallet, onClose }: EditWalletModalPro
 function WalletCard({ wallet, onEdit }: { wallet: Wallet; onEdit: (wallet: Wallet) => void }) {
   return (
     <>
-      <div className="card text-primary-content bg-primary join-item">
+      <div className="card join-item bg-primary text-primary-content">
         <div className="card-body flex-row justify-between">
           <div>
             <h2 className="card-title">{wallet.name}</h2>
@@ -163,7 +163,7 @@ export default function AccountSetup() {
   }
 
   return (
-    <main className="flex flex-col gap-5 px-5 py-6 h-[100dvh]">
+    <main className="flex h-[100dvh] flex-col gap-5 px-5 py-6">
       <section>
         <h1 className="text-4xl font-medium">Let's setup your account!</h1>
         <p>Account can be your bank, credit card or your wallet</p>
@@ -214,8 +214,8 @@ export default function AccountSetup() {
         )}
       </section>
 
-      <section className="mt-auto join join-vertical">
-        <button onClick={completeSetup} className="btn btn-primary w-full join-item">
+      <section className="join join-vertical mt-auto">
+        <button onClick={completeSetup} className="btn btn-primary join-item w-full">
           Complete
         </button>
       </section>

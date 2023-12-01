@@ -39,23 +39,23 @@ export default function Hello() {
   }, []);
 
   return (
-    <main className="bg-primary flex flex-col h-[100dvh] justify-center items-center gap-2">
+    <main className="flex h-[100dvh] flex-col items-center justify-center gap-2 bg-primary">
       <h1 className="text-5xl font-bold italic text-primary-content">Splur.</h1>
-      <p className="text-secondary-content text-sm">An open source personal expense manager app</p>
+      <p className="text-sm text-secondary-content">An open source personal expense manager app</p>
       <Link to="account">
         <button className="btn btn-neutral btn-wide mt-5">Let's Go</button>
       </Link>
 
       <dialog id="pwa-prompt-modal" className="modal modal-bottom" open={isModalOpen}>
         <div className="modal-box">
-          <h1 className="text-2xl mb-2">Installation</h1>
+          <h1 className="mb-2 text-2xl">Installation</h1>
           <p>
             This app is intended to be used as standalone app, we recommend installing the app to
             directly launch from home screen, along with many other exclusive feature.
           </p>
 
           <button
-            className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+            className="btn btn-circle btn-ghost btn-sm absolute right-2 top-2"
             onClick={() => {
               setIsModalOpen(false);
               installEvent.current = null;
