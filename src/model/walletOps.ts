@@ -9,6 +9,10 @@ export class WalletOperations {
     return await db.wallets.get(id);
   }
 
+  static getObj(wallets: Wallet[], id: number): Wallet | undefined {
+    return wallets.find(item => item.id === id);
+  }
+
   static async get(): Promise<Wallet[]> {
     return await db.wallets.toArray();
   }
