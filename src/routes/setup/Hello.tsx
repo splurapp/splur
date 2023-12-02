@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 
 export default function Hello() {
-  const installEvent = useRef<Event | null>(null);
+  const installEvent = useRef<BeforeInstallPromptEvent | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handlePwaInstall = async () => {
@@ -10,9 +10,7 @@ export default function Hello() {
       return;
     }
 
-    // @ts-ignore
-    installEvent.current.prompt();
-    // @ts-ignore
+    await installEvent.current.prompt();
     const result = await installEvent.current.userChoice;
     if (result.outcome === "accepted") {
       setIsModalOpen(false);
@@ -26,7 +24,7 @@ export default function Hello() {
     const handleBeforeInstallPrompt = (e: Event) => {
       if ("BeforeInstallPromptEvent" in window) {
         e.preventDefault();
-        installEvent.current = e;
+        installEvent.current = e as BeforeInstallPromptEvent;
         setIsModalOpen(true);
       }
     };
@@ -70,7 +68,7 @@ export default function Hello() {
           </button>
 
           <div className="modal-action">
-            <button className="btn btn-primary w-full" onClick={handlePwaInstall}>
+            <button className="btn btn-primary w-full" onClick={() => void handlePwaInstall()}>
               Add to homescreen
             </button>
           </div>

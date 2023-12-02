@@ -2,10 +2,10 @@ import { SplurTransaction } from "@/model/db";
 import { LoanOperations } from "@/model/transactionOps";
 import { useState } from "react";
 
-type Props = {
+interface Props {
   info: SplurTransaction;
   refresh: () => Promise<void>;
-};
+}
 
 export default function EditParentLoan({ info, refresh }: Props) {
   const [show, setShow] = useState(false);
@@ -36,7 +36,7 @@ export default function EditParentLoan({ info, refresh }: Props) {
           <button className="btn" onClick={() => setShow(!show)}>
             Cancel
           </button>
-          <button className="btn btn-primary" onClick={editLoan}>
+          <button className="btn btn-primary" onClick={() => void editLoan()}>
             Edit
           </button>
         </div>

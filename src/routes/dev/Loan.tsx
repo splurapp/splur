@@ -1,17 +1,15 @@
 import { ExchangeType, SplurTransaction } from "@/model/db";
-import { LoanOperations, TransactionOperations } from "@/model/transactionOps";
+import { LoanOperations } from "@/model/transactionOps";
 import { useState } from "react";
-import EditParentLoan from "./EditParentLoan";
 import ChildLoans from "./ChildLoans";
-
-type Props = {};
+import EditParentLoan from "./EditParentLoan";
 
 const getExchangeType = (i: string) => {
   if (ExchangeType.BORROW.toString() === i) return ExchangeType.BORROW;
   return ExchangeType.LEND;
 };
 
-export default function Loan({}: Props) {
+export default function Loan() {
   const [loans, setLoans] = useState<SplurTransaction[]>([]);
   const [childLoans, setChildLoans] = useState<SplurTransaction[]>([]);
   const [exchangeType, setExchangeType] = useState<ExchangeType>(() => ExchangeType.BORROW);
@@ -74,7 +72,7 @@ export default function Loan({}: Props) {
       <div>
         <h2>
           Loans{" "}
-          <button className="btn btn-primary" onClick={refreshLoans}>
+          <button className="btn btn-primary" onClick={() => void refreshLoans()}>
             Refresh
           </button>
         </h2>
@@ -94,7 +92,7 @@ export default function Loan({}: Props) {
             <div>
               Completion :: <strong>{getCompletion(item)}</strong>
             </div>
-            <button className="btn" onClick={() => deleteLoan(item.id)}>
+            <button className="btn" onClick={() => void deleteLoan(item.id)}>
               Delete
             </button>
             <EditParentLoan info={item} refresh={refreshLoans} />
@@ -128,7 +126,7 @@ export default function Loan({}: Props) {
         ></input>
         <br></br>
         <br></br>
-        <button className="btn btn-primary" onClick={createLoan}>
+        <button className="btn btn-primary" onClick={() => void createLoan()}>
           Create Loan
         </button>
       </div>

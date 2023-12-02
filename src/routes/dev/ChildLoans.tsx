@@ -1,13 +1,13 @@
-import { ExchangeType, SplurTransaction } from "@/model/db";
+import { SplurTransaction } from "@/model/db";
 import { LoanOperations } from "@/model/transactionOps";
 import { useEffect, useState } from "react";
-import EditChildTransaction from "./EditChildTransaction";
 import AddChildTransaction from "./AddChildTransaction";
+import EditChildTransaction from "./EditChildTransaction";
 
-type Props = {
+interface Props {
   parent: SplurTransaction;
   refresh: () => Promise<void>;
-};
+}
 
 export default function ChildLoans({ parent, refresh }: Props) {
   const [transactions, setTransactions] = useState<SplurTransaction[]>([]);
@@ -31,7 +31,9 @@ export default function ChildLoans({ parent, refresh }: Props) {
   }, [transactions]);
 
   useEffect(() => {
-    refresh().then(() => {});
+    refresh().catch(reason => {
+      console.error(reason);
+    });
   }, [transactions]);
 
   return (
@@ -49,7 +51,7 @@ export default function ChildLoans({ parent, refresh }: Props) {
             Parent/TRN Balance Amount - {parent.amount}/{totalCalcAmount}
           </div>
           <h1>Transactions - </h1>
-          <button className="btn btn-primary" onClick={refreshTransactions}>
+          <button className="btn btn-primary" onClick={() => void refreshTransactions()}>
             Refresh
           </button>
           <br></br>

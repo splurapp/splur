@@ -1,16 +1,16 @@
 import { ExchangeType, SplurTransaction } from "@/model/db";
 import { LoanOperations } from "@/model/transactionOps";
-import React, { useEffect, useState } from "react";
+import { useState } from "react";
 
-type Props = {
+interface Props {
   parent: SplurTransaction;
   refreshTransactions: () => Promise<void>;
-};
+}
 
 export default function AddChildTransaction({ parent, refreshTransactions }: Props) {
   const [show, setShow] = useState(false);
   const [amount, setAmount] = useState(0);
-  const [exchangeType, setExchangeType] = useState<ExchangeType>(() =>
+  const [exchangeType] = useState<ExchangeType>(() =>
     parent.exchangeType === ExchangeType.BORROW ? ExchangeType.SUB_BORROW : ExchangeType.SUB_LEND,
   );
 
@@ -63,7 +63,7 @@ export default function AddChildTransaction({ parent, refreshTransactions }: Pro
             <button className="btn" onClick={() => setShow(!show)}>
               Close
             </button>
-            <button className="btn btn-primary" onClick={addTransaction}>
+            <button className="btn btn-primary" onClick={() => void addTransaction()}>
               Add
             </button>
           </div>

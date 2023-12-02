@@ -5,12 +5,12 @@ import { type AsyncReturnType } from "@/types/utils";
 import { useState } from "react";
 import { useLoaderData, useNavigate } from "react-router-dom";
 
-type EditWalletModalProps = {
+interface EditWalletModalProps {
   wallet: Wallet;
   isOpen: boolean;
   onSave: (editedWallet: Wallet) => void;
   onClose: () => void;
-};
+}
 
 function EditWalletModal({ isOpen, onSave, wallet, onClose }: EditWalletModalProps) {
   const [editedName, setEditedName] = useState(wallet.name);
@@ -138,7 +138,7 @@ export default function AccountSetup() {
   async function createWallet(newWallet: Wallet) {
     const res = await WalletOperations.create(newWallet); // TODO: error handle
     if (!res) return;
-    setDefaultWallets(prevWallets => prevWallets!.filter(wallet => wallet.name !== newWallet.name));
+    setDefaultWallets(prevWallets => prevWallets.filter(wallet => wallet.name !== newWallet.name));
     setWallets([...wallets, res]);
   }
 
@@ -179,7 +179,7 @@ export default function AccountSetup() {
         {currentWallet && (
           <EditWalletModal
             isOpen={isModalOpen}
-            onSave={handleUpdate}
+            onSave={editedWallet => void handleUpdate(editedWallet)}
             onClose={() => {
               setCurrentWallet(null);
               setIsModalOpen(false);
@@ -196,7 +196,7 @@ export default function AccountSetup() {
                 <button
                   key={wallet.name}
                   className="btn btn-neutral btn-outline"
-                  onClick={() => createWallet(wallet)}
+                  onClick={() => void createWallet(wallet)}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"

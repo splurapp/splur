@@ -3,14 +3,12 @@ import { TransactionOperations } from "@/model/transactionOps";
 import { WalletOperations } from "@/model/walletOps";
 import { useEffect, useState } from "react";
 
-type Props = {
+interface Props {
   wallet: Wallet;
   refreshTransactions: () => Promise<void>;
-};
-
-interface SubCategories {
-  [category: string]: string[];
 }
+
+type SubCategories = Record<string, string[]>;
 
 const subCategories: SubCategories = {
   None: ["None"],
@@ -104,7 +102,9 @@ export default function AddTransaction({ wallet, refreshTransactions }: Props) {
   };
 
   useEffect(() => {
-    WalletOperations.get().then(ret => setWallets(ret));
+    WalletOperations.get()
+      .then(ret => setWallets(ret))
+      .catch(reason => console.error(reason));
   }, []);
 
   return (
@@ -178,7 +178,7 @@ export default function AddTransaction({ wallet, refreshTransactions }: Props) {
             <button className="btn" onClick={() => setShow(!show)}>
               Close
             </button>
-            <button className="btn btn-primary" onClick={addTransaction}>
+            <button className="btn btn-primary" onClick={() => void addTransaction()}>
               Add
             </button>
           </div>

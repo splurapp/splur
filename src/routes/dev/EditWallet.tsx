@@ -2,10 +2,10 @@ import { Wallet } from "@/model/db";
 import { WalletOperations } from "@/model/walletOps";
 import { useState } from "react";
 
-type EditWalletProps = {
+interface EditWalletProps {
   info: Wallet;
   refresh: () => Promise<void>;
-};
+}
 
 const EditWallet: React.FC<EditWalletProps> = ({ info, refresh }) => {
   const [show, setShow] = useState(false);
@@ -46,7 +46,7 @@ const EditWallet: React.FC<EditWalletProps> = ({ info, refresh }) => {
           <button className="btn" onClick={() => setShow(!show)}>
             Cancel
           </button>
-          <button className="btn btn-primary" onClick={editWallet}>
+          <button className="btn btn-primary" onClick={() => void editWallet()}>
             Edit
           </button>
         </div>

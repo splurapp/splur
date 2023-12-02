@@ -1,14 +1,14 @@
 import { ExchangeType, SplurTransaction, Wallet } from "@/model/db";
-import { useEffect, useState } from "react";
-import "./transaction.css";
 import { TransactionOperations } from "@/model/transactionOps";
-import EditTransaction from "./EditTransaction";
+import { useEffect, useState } from "react";
 import AddTransaction from "./AddTransaction";
+import EditTransaction from "./EditTransaction";
+import "./transaction.css";
 
-type Props = {
+interface Props {
   wallet: Wallet;
   refresh: () => Promise<void>;
-};
+}
 
 export default function Transactions({ wallet, refresh }: Props) {
   const [transactions, setTransactions] = useState<SplurTransaction[]>([]);
@@ -48,7 +48,9 @@ export default function Transactions({ wallet, refresh }: Props) {
   }, [transactions]);
 
   useEffect(() => {
-    refresh().then(() => {});
+    refresh().catch(reason => {
+      console.error(reason);
+    });
   }, [transactions]);
   return (
     <div>
@@ -65,7 +67,7 @@ export default function Transactions({ wallet, refresh }: Props) {
             Wallet/TRN Balance Amount - {wallet.amount}/{totalCalcAmount}
           </div>
           <h1>Transactions - </h1>
-          <button className="btn btn-primary" onClick={refreshTransactions}>
+          <button className="btn btn-primary" onClick={() => void refreshTransactions()}>
             Refresh
           </button>
           <br></br>

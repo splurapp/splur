@@ -1,9 +1,9 @@
-import { useState } from "react";
 import { Wallet, WalletType } from "@/model/db";
 import { WalletOperations } from "@/model/walletOps";
+import { useState } from "react";
 import EditWallet from "./EditWallet";
-import Transactions from "./Transactions";
 import Loan from "./Loan";
+import Transactions from "./Transactions";
 
 export default function Dev() {
   const [wallets, setWallets] = useState<Wallet[]>([]);
@@ -39,7 +39,7 @@ export default function Dev() {
       <div>
         <h2>
           Wallets{" "}
-          <button className="btn btn-primary" onClick={refreshWallet}>
+          <button className="btn btn-primary" onClick={() => void refreshWallet()}>
             Refresh
           </button>
         </h2>
@@ -55,7 +55,7 @@ export default function Dev() {
             <div>
               Amount :: <strong>{item.amount}</strong>
             </div>
-            <button className="btn" onClick={() => deleteWallet(item.id)}>
+            <button className="btn" onClick={() => void deleteWallet(item.id)}>
               Delete
             </button>
             <EditWallet info={item} refresh={refreshWallet} />
@@ -80,7 +80,7 @@ export default function Dev() {
       ></input>
       <br></br>
       <br></br>
-      <button className="btn btn-primary" onClick={createWallet}>
+      <button className="btn btn-primary" onClick={() => void createWallet()}>
         Create Wallet
       </button>
       <Loan />

@@ -1,5 +1,5 @@
-export type AsyncReturnType<T extends (...args: any) => Promise<any>> = T extends (
-  ...args: any
+export type AsyncReturnType<T extends (...args: unknown[]) => Promise<unknown>> = T extends (
+  ...args: unknown[]
 ) => Promise<infer R>
   ? R
-  : any;
+  : unknown;

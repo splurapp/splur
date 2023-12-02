@@ -3,16 +3,14 @@ import { TransactionOperations } from "@/model/transactionOps";
 import { WalletOperations } from "@/model/walletOps";
 import { useEffect, useState } from "react";
 
-type Props = {
+interface Props {
   wallet: Wallet;
   disabled: boolean;
   transaction: SplurTransaction;
   refreshTransactions: () => Promise<void>;
-};
-
-interface SubCategories {
-  [category: string]: string[];
 }
+
+type SubCategories = Record<string, string[]>;
 
 const subCategories: SubCategories = {
   None: ["None"],
@@ -126,7 +124,9 @@ export default function EditTransaction({
   };
 
   useEffect(() => {
-    WalletOperations.get().then(ret => setWallets(ret));
+    WalletOperations.get()
+      .then(ret => setWallets(ret))
+      .catch(reason => console.error(reason));
   }, []);
 
   return (
@@ -138,9 +138,7 @@ export default function EditTransaction({
           </button>
           <button
             className={`btn ${disabled && "disabled"}`}
-            onClick={() => {
-              deleteTransaction(transaction.id);
-            }}
+            onClick={() => void deleteTransaction(transaction.id)}
           >
             Delete
           </button>
@@ -208,7 +206,7 @@ export default function EditTransaction({
             <button className="btn" onClick={() => setShow(!show)}>
               Close
             </button>
-            <button className="btn btn-primary" onClick={updateTransaction}>
+            <button className="btn btn-primary" onClick={() => void updateTransaction()}>
               Update
             </button>
           </div>

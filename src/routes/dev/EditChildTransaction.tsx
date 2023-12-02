@@ -1,14 +1,14 @@
 import { SplurTransaction } from "@/model/db";
 import { LoanOperations } from "@/model/transactionOps";
-import React, { useEffect, useState } from "react";
+import { useState } from "react";
 
-type Props = {
+interface Props {
   parent: SplurTransaction;
   transaction: SplurTransaction;
   refreshTransactions: () => Promise<void>;
-};
+}
 
-export default function EditChildTransaction({ parent, transaction, refreshTransactions }: Props) {
+export default function EditChildTransaction({ transaction, refreshTransactions }: Props) {
   const [show, setShow] = useState(false);
   const [amount, setAmount] = useState(() => transaction.amount);
 
@@ -35,12 +35,7 @@ export default function EditChildTransaction({ parent, transaction, refreshTrans
           <button className={`btn`} onClick={() => setShow(!show)}>
             Edit
           </button>
-          <button
-            className={`btn`}
-            onClick={() => {
-              deleteTransaction(transaction.id);
-            }}
-          >
+          <button className={`btn`} onClick={() => void deleteTransaction(transaction.id)}>
             Delete
           </button>
         </>
@@ -63,7 +58,7 @@ export default function EditChildTransaction({ parent, transaction, refreshTrans
             <button className="btn" onClick={() => setShow(!show)}>
               Close
             </button>
-            <button className="btn btn-primary" onClick={updateTransaction}>
+            <button className="btn btn-primary" onClick={() => void updateTransaction()}>
               Update
             </button>
           </div>

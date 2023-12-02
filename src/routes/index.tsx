@@ -15,7 +15,7 @@ import Hello from "./setup/Hello";
 export const router = createBrowserRouter([
   {
     path: "/",
-    loader: async ({ request }) => {
+    loader: ({ request }) => {
       const isSetupDone = isInitialSetupDone();
       if (request.url.includes("/setup")) {
         return isSetupDone ? redirect("/") : null;
