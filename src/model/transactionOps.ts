@@ -1,5 +1,5 @@
 import { IndexableType } from "dexie";
-import db, { SplurTransaction, ExchangeType } from "./db";
+import db, { ExchangeType, SplurTransaction } from "./db";
 import { WalletOperations } from "./walletOps";
 
 export class TransactionOperations {
@@ -129,7 +129,7 @@ export class TransactionOperations {
   static async addBulk(transactions: SplurTransaction[]): Promise<boolean> {
     return await db.transaction("rw", db.splurTransactions, db.wallets, async () => {
       try {
-        for (let transaction of transactions) {
+        for (const transaction of transactions) {
           if (LoanOperations.isLoan(transaction)) {
             throw new Error(
               "This Exchange type is not allowed for this operation. Please use LoanOperations methods.",
@@ -146,7 +146,7 @@ export class TransactionOperations {
         await db.splurTransactions.bulkAdd(transactions);
 
         // Sync wallet
-        for (let transaction of transactions) {
+        for (const transaction of transactions) {
           await WalletOperations.sync(transaction);
         }
         return true;
@@ -241,8 +241,8 @@ export class TransactionOperations {
         // Not deleting any transaction records when its loan
         const transactionIdsWithoutLoan: number[] = [];
         const transactionIdsWithLoan: SplurTransaction[] = [];
-        for (let transaction of transactions) {
-          if (transaction !== undefined && transaction.id) {
+        for (const transaction of transactions) {
+          if (transaction?.id) {
             if (LoanOperations.isLoan(transaction)) {
               transaction.assignedTo = undefined;
               transactionIdsWithLoan.push(transaction);
@@ -265,7 +265,7 @@ export class TransactionOperations {
 }
 
 export class LoanOperations {
-  static isLoan(transaction: SplurTransaction): Boolean {
+  static isLoan(transaction: SplurTransaction): boolean {
     return [
       ExchangeType.BORROW,
       ExchangeType.SUB_BORROW,

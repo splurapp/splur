@@ -139,7 +139,7 @@ export class WalletOperations {
     });
   }
 
-  static async sync(transaction: SplurTransaction, revert: boolean = false): Promise<boolean> {
+  static async sync(transaction: SplurTransaction, revert = false): Promise<boolean> {
     return await db.transaction("rw", db.wallets, db.splurTransactions, async () => {
       try {
         if (transaction.exchangeType !== ExchangeType.TRANSFER) {

@@ -46,9 +46,9 @@ export interface SplurTransaction {
   // dismissed?: boolean; // Used for Lend OR BORROW
   category?: string;
   subcategory?: string;
-  autoCategoryMap: boolean | true; // For marchant to Category or Sub Category Mapping
-  recurringId?: any; // To identify recurring transaction
-  loanId?: any; // To identify loan transaction
+  autoCategoryMap: boolean; // For marchant to Category or Sub Category Mapping
+  recurringId?: number; // To identify recurring transaction
+  loanId?: number; // To identify loan transaction
 }
 
 // export interface Loan {
@@ -76,7 +76,7 @@ export interface CategoryMap {
   exchanger: string;
   subcategory: string | null;
   conditionType: string; // CONTAINS, BEGINSWITH, ENDSWITH, EQUALSTO
-  caseSensitiveCheck: boolean | true;
+  caseSensitiveCheck: boolean; // by default true
 }
 
 export interface ImportStatementConfig {
@@ -89,7 +89,7 @@ export interface ImportStatementConfig {
     },
   ];
   // DAY 3
-  detectionCondition: string | "AND"; // AND, OR, 1 AND 2 OR 3
+  detectionCondition: "AND" | "OR"; // AND, OR, 1 AND 2 OR 3  // by default "AND"
   transactionMap: [
     {
       columnName: string; // Excel column name
@@ -108,7 +108,7 @@ export class MySubClassedDexie extends Dexie {
   importStatementConfigs!: Table<ImportStatementConfig>;
 
   constructor(databaseName?: string) {
-    super(databaseName || "splur");
+    super(databaseName ?? "splur");
     this.version(1).stores({
       wallets: "++id, &name",
       user: "&name",
