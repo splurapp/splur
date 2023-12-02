@@ -1,98 +1,152 @@
 import { IndexableType } from "dexie";
-import db, { ExchangeType, SplurTransaction } from "./db";
+import db, { ExchangeType, SplurTransaction, Wallet } from "./db";
 import { WalletOperations } from "./walletOps";
 
 export class TransactionOperations {
-  static async get(walletId?: number): Promise<SplurTransaction[]> {
+  static mapObj(wallets: Wallet[], transaction?: SplurTransaction): SplurTransaction | undefined {
+    if (!transaction) return undefined;
+
+    if (transaction.assignedTo)
+      transaction.assignedToWallet = WalletOperations.getObj(wallets, transaction?.assignedTo);
+
+    if (transaction.transferFrom)
+      transaction.transferFromWallet = WalletOperations.getObj(wallets, transaction?.transferFrom);
+
+    if (transaction.transferTo)
+      transaction.transferToWallet = WalletOperations.getObj(wallets, transaction?.transferTo);
+
+    return transaction;
+  }
+
+  static async get(walletId?: number): Promise<(SplurTransaction | undefined)[]> {
+    const wallets = await WalletOperations.get();
+    let transactions = [];
+
     if (walletId) {
-      return await db.splurTransactions
+      transactions = await db.splurTransactions
         .where("assignedTo")
         .equals(walletId)
         .or("transferFrom")
         .equals(walletId)
         .toArray();
+    } else {
+      transactions = await db.splurTransactions.toArray();
     }
 
-    return await db.splurTransactions.toArray();
+    return transactions.map(item => this.mapObj(wallets, item));
   }
 
   static async getById(transactionId?: number): Promise<SplurTransaction | undefined> {
-    return db.splurTransactions.get(transactionId as IndexableType);
+    const wallets = await WalletOperations.get();
+    const transaction = await db.splurTransactions.get(transactionId as IndexableType);
+
+    // Map category as well
+    // WIP
+    return this.mapObj(wallets, transaction);
   }
 
   static async bulkGet(walletIds: number[]): Promise<(SplurTransaction | undefined)[]> {
     if (walletIds?.length > 0) {
-      return await db.splurTransactions.bulkGet(walletIds);
+      const wallets = await WalletOperations.get();
+      const transactions = await db.splurTransactions.bulkGet(walletIds);
+      return transactions.map(item => this.mapObj(wallets, item));
     }
 
     return [];
   }
 
-  static async getByYear(year: number, walletId?: number | null): Promise<SplurTransaction[]> {
+  static async getByYear(
+    year: number,
+    walletId?: number | null,
+  ): Promise<(SplurTransaction | undefined)[]> {
     const startOfYear = new Date(year, 0, 1);
     const endOfYear = new Date(year, 11, 31);
+    const wallets = await WalletOperations.get();
+    let transactions = [];
 
     if (walletId) {
-      return await db.splurTransactions
+      transactions = await db.splurTransactions
         .where("timestamp")
         .between(startOfYear, endOfYear, true, true)
         .and(record => record.assignedTo === walletId)
         .toArray();
+    } else {
+      transactions = await db.splurTransactions
+        .where("timestamp")
+        .between(startOfYear, endOfYear, true, true)
+        .toArray();
     }
 
-    return await db.splurTransactions
-      .where("timestamp")
-      .between(startOfYear, endOfYear, true, true)
-      .toArray();
+    return transactions.map(item => this.mapObj(wallets, item));
   }
 
-  static async getByMonth(month: number, walletId?: number | null): Promise<SplurTransaction[]> {
+  static async getByMonth(
+    month: number,
+    walletId?: number | null,
+  ): Promise<(SplurTransaction | undefined)[]> {
     const startOfMonth = new Date().setMonth(month, 1);
     const endOfMonth = new Date().setMonth(month, 0);
+    const wallets = await WalletOperations.get();
+    let transactions = [];
 
     if (walletId) {
-      return await db.splurTransactions
+      transactions = await db.splurTransactions
         .where("timestamp")
         .between(startOfMonth, endOfMonth, true, true)
         .and(record => record.assignedTo === walletId)
         .toArray();
+    } else {
+      transactions = await db.splurTransactions
+        .where("timestamp")
+        .between(startOfMonth, endOfMonth, true, true)
+        .toArray();
     }
 
-    return await db.splurTransactions
-      .where("timestamp")
-      .between(startOfMonth, endOfMonth, true, true)
-      .toArray();
+    return transactions.map(item => this.mapObj(wallets, item));
   }
 
-  static async getByDate(date: Date, walletId?: number | null): Promise<SplurTransaction[]> {
+  static async getByDate(
+    date: Date,
+    walletId?: number | null,
+  ): Promise<(SplurTransaction | undefined)[]> {
+    const wallets = await WalletOperations.get();
+    let transactions = [];
+
     if (walletId) {
-      return await db.splurTransactions
+      transactions = await db.splurTransactions
         .where("timestamp")
         .equals(date)
         .and(record => record.assignedTo === walletId)
         .toArray();
+    } else {
+      transactions = await db.splurTransactions.where("timestamp").equals(date).toArray();
     }
 
-    return await db.splurTransactions.where("timestamp").equals(date).toArray();
+    return transactions.map(item => this.mapObj(wallets, item));
   }
 
   static async getByDateRange(
     startDate: Date,
     endDate: Date,
     walletId?: number | null,
-  ): Promise<SplurTransaction[]> {
+  ): Promise<(SplurTransaction | undefined)[]> {
+    const wallets = await WalletOperations.get();
+    let transactions = [];
+
     if (walletId) {
-      return await db.splurTransactions
+      transactions = await db.splurTransactions
         .where("timestamp")
         .between(startDate, endDate, true, true)
         .and(record => record.assignedTo === walletId)
         .toArray();
+    } else {
+      transactions = await db.splurTransactions
+        .where("timestamp")
+        .between(startDate, endDate, true, true)
+        .toArray();
     }
 
-    return await db.splurTransactions
-      .where("timestamp")
-      .between(startDate, endDate, true, true)
-      .toArray();
+    return transactions.map(item => this.mapObj(wallets, item));
   }
 
   static async add(transaction: SplurTransaction): Promise<SplurTransaction | null> {
@@ -117,7 +171,9 @@ export class TransactionOperations {
         // Get the transaction object
         if (!newTransactionId) throw new Error("Transaction creation failed");
 
-        const newTransaction = await TransactionOperations.getById(newTransactionId as number);
+        const wallets = await WalletOperations.get();
+        let newTransaction = await TransactionOperations.getById(newTransactionId as number);
+        newTransaction = this.mapObj(wallets, newTransaction);
         return newTransaction ? newTransaction : null;
       } catch (error) {
         console.log(error);
@@ -195,7 +251,9 @@ export class TransactionOperations {
           await WalletOperations.sync(transaction);
 
           // Gets updated transaction
-          const updatedTransaction = await TransactionOperations.getById(transaction.id);
+          const wallets = await WalletOperations.get();
+          let updatedTransaction = await TransactionOperations.getById(transaction.id);
+          updatedTransaction = this.mapObj(wallets, updatedTransaction);
           return updatedTransaction ? updatedTransaction : null;
         }
 
@@ -303,7 +361,9 @@ export class LoanOperations {
         }
 
         // Gets transaction
-        const newTransaction = await TransactionOperations.getById(objIndex as number);
+        const wallets = await WalletOperations.get();
+        let newTransaction = await TransactionOperations.getById(objIndex as number);
+        newTransaction = TransactionOperations.mapObj(wallets, newTransaction);
         return newTransaction ? newTransaction : null;
       } catch (error) {
         console.log(error);
@@ -355,7 +415,9 @@ export class LoanOperations {
         }
 
         // Gets transaction
-        const newTransaction = await TransactionOperations.getById(transactionId as number);
+        const wallets = await WalletOperations.get();
+        let newTransaction = await TransactionOperations.getById(transactionId as number);
+        newTransaction = TransactionOperations.mapObj(wallets, newTransaction);
         return newTransaction ? newTransaction : null;
       } catch (error) {
         console.log(error);
@@ -391,7 +453,9 @@ export class LoanOperations {
           }
 
           // Gets updated transaction
-          const updatedTransaction = await TransactionOperations.getById(transaction.id);
+          const wallets = await WalletOperations.get();
+          let updatedTransaction = await TransactionOperations.getById(transaction.id);
+          updatedTransaction = TransactionOperations.mapObj(wallets, updatedTransaction);
           return updatedTransaction ? updatedTransaction : null;
         }
 

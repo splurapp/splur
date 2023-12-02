@@ -113,7 +113,7 @@ export class MySubClassedDexie extends Dexie {
   user!: Table<User>;
   wallets!: Table<Wallet>;
   splurTransactions!: Table<SplurTransaction>;
-  categories!: Table<Category>
+  categories!: Table<Category>;
   // loans!: Table<Loan>;
   preferences!: Table<Preferences>;
   categoryMaps!: Table<CategoryMap>;
