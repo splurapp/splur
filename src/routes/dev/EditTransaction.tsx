@@ -10,45 +10,30 @@ interface Props {
   refreshTransactions: () => Promise<void>;
 }
 
-type SubCategories = Record<string, string[]>;
+// type SubCategories = Record<string, string[]>;
 
-const subCategories: SubCategories = {
-  None: ["None"],
-  Food: ["None"],
-  "Bills & Utilities": [
-    "Credit Card Bill",
-    "Mobile Recharge",
-    "Electricity",
-    "Rent",
-    "Water",
-    "Gas",
-    "Tax",
-  ],
-  Shopping: ["None"],
-  Travel: ["None"],
-  Entertainment: ["None"],
-  Medical: ["None"],
-  "Personal Care": ["None"],
-  Education: ["None"],
-  Invest: ["SIP", "FD", "Stocks", "Insurance"],
-  Grocery: ["None"],
-  Others: ["None"],
-};
-
-const categories = [
-  "None",
-  "Food",
-  "Bills & Utilities",
-  "Shopping",
-  "Travel",
-  "Entertainment",
-  "Medical",
-  "Personal Care",
-  "Education",
-  "Invest",
-  "Grocery",
-  "Others",
-];
+// const subCategories: SubCategories = {
+//   None: ["None"],
+//   Food: ["None"],
+//   "Bills & Utilities": [
+//     "Credit Card Bill",
+//     "Mobile Recharge",
+//     "Electricity",
+//     "Rent",
+//     "Water",
+//     "Gas",
+//     "Tax",
+//   ],
+//   Shopping: ["None"],
+//   Travel: ["None"],
+//   Entertainment: ["None"],
+//   Medical: ["None"],
+//   "Personal Care": ["None"],
+//   Education: ["None"],
+//   Invest: ["SIP", "FD", "Stocks", "Insurance"],
+//   Grocery: ["None"],
+//   Others: ["None"],
+// };
 
 const getExchangeType = (i: string) => {
   if (ExchangeType.BORROW.toString() === i) return ExchangeType.BORROW;
@@ -69,12 +54,6 @@ export default function EditTransaction({
 
   const [transferTo, setTransferTo] = useState(() =>
     transaction.transferTo ? transaction.transferTo : 0,
-  );
-  const [category, setCategory] = useState<string>(() =>
-    transaction?.category ? transaction.category : "None",
-  );
-  const [subCategory, setSubCategory] = useState<string>(() =>
-    transaction?.subcategory ? transaction.subcategory : "None",
   );
   const [exchangeType, setExchangeType] = useState<ExchangeType>(transaction.exchangeType);
   const [amount, setAmount] = useState(() => transaction.amount);

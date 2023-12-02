@@ -29,8 +29,6 @@ export class WalletOperations {
             assignedTo: walletId,
             amount: wallet.amount,
             autoCategoryMap: false,
-            category: "other",
-            subcategory: "other",
             // dismissed: undefined,
             exchanger: undefined,
             exchangeType: ExchangeType.CREDIT,
@@ -115,8 +113,6 @@ export class WalletOperations {
                 ? wallet.amount - currWallet.amount
                 : currWallet.amount - wallet.amount,
             autoCategoryMap: false,
-            category: "other",
-            subcategory: "other",
             // dismissed: undefined,
             exchanger: undefined,
             exchangeType:

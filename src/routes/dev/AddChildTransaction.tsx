@@ -23,8 +23,6 @@ export default function AddChildTransaction({ parent, refreshTransactions }: Pro
       exchangeType: exchangeType,
       amount: amount,
       loanId: parent.id,
-      category: "loan",
-      subcategory: parent.exchangeType === ExchangeType.BORROW ? "borrow" : "lend",
     };
     await LoanOperations.addChild(myNewTransaction, parent.id);
 
