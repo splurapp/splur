@@ -8,7 +8,7 @@ interface Props {
   refreshTransactions: () => Promise<void>;
 }
 
-type SubCategories = Record<string, string[]>;
+// type SubCategories = Record<string, string[]>;
 
 // const subCategories: SubCategories = {
 //   None: ["None"],
