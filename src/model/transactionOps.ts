@@ -18,7 +18,15 @@ export class TransactionOperations {
     return transaction;
   }
 
-  static async get(walletId?: number): Promise<(SplurTransaction | undefined)[]> {
+  static objsNormalizer(transactions: (SplurTransaction | undefined)[]): SplurTransaction[] {
+    const ret: SplurTransaction[] = [];
+    transactions.forEach(item => {
+      if (item) ret.push(item);
+    });
+    return ret;
+  }
+
+  static async get(walletId?: number): Promise<SplurTransaction[]> {
     const wallets = await WalletOperations.get();
     let transactions = [];
 
@@ -33,7 +41,7 @@ export class TransactionOperations {
       transactions = await db.splurTransactions.toArray();
     }
 
-    return transactions.map(item => this.mapObj(wallets, item));
+    return this.objsNormalizer(transactions.map(item => this.mapObj(wallets, item)));
   }
 
   static async getById(transactionId?: number): Promise<SplurTransaction | undefined> {
@@ -45,20 +53,17 @@ export class TransactionOperations {
     return this.mapObj(wallets, transaction);
   }
 
-  static async bulkGet(walletIds: number[]): Promise<(SplurTransaction | undefined)[]> {
+  static async bulkGet(walletIds: number[]): Promise<SplurTransaction[]> {
     if (walletIds?.length > 0) {
       const wallets = await WalletOperations.get();
       const transactions = await db.splurTransactions.bulkGet(walletIds);
-      return transactions.map(item => this.mapObj(wallets, item));
+      return this.objsNormalizer(transactions.map(item => this.mapObj(wallets, item)));
     }
 
     return [];
   }
 
-  static async getByYear(
-    year: number,
-    walletId?: number | null,
-  ): Promise<(SplurTransaction | undefined)[]> {
+  static async getByYear(year: number, walletId?: number | null): Promise<SplurTransaction[]> {
     const startOfYear = new Date(year, 0, 1);
     const endOfYear = new Date(year, 11, 31);
     const wallets = await WalletOperations.get();
@@ -77,13 +82,10 @@ export class TransactionOperations {
         .toArray();
     }
 
-    return transactions.map(item => this.mapObj(wallets, item));
+    return this.objsNormalizer(transactions.map(item => this.mapObj(wallets, item)));
   }
 
-  static async getByMonth(
-    month: number,
-    walletId?: number | null,
-  ): Promise<(SplurTransaction | undefined)[]> {
+  static async getByMonth(month: number, walletId?: number | null): Promise<SplurTransaction[]> {
     const startOfMonth = new Date().setMonth(month, 1);
     const endOfMonth = new Date().setMonth(month, 0);
     const wallets = await WalletOperations.get();
@@ -102,13 +104,10 @@ export class TransactionOperations {
         .toArray();
     }
 
-    return transactions.map(item => this.mapObj(wallets, item));
+    return this.objsNormalizer(transactions.map(item => this.mapObj(wallets, item)));
   }
 
-  static async getByDate(
-    date: Date,
-    walletId?: number | null,
-  ): Promise<(SplurTransaction | undefined)[]> {
+  static async getByDate(date: Date, walletId?: number | null): Promise<SplurTransaction[]> {
     const wallets = await WalletOperations.get();
     let transactions = [];
 
@@ -122,14 +121,14 @@ export class TransactionOperations {
       transactions = await db.splurTransactions.where("timestamp").equals(date).toArray();
     }
 
-    return transactions.map(item => this.mapObj(wallets, item));
+    return this.objsNormalizer(transactions.map(item => this.mapObj(wallets, item)));
   }
 
   static async getByDateRange(
     startDate: Date,
     endDate: Date,
     walletId?: number | null,
-  ): Promise<(SplurTransaction | undefined)[]> {
+  ): Promise<SplurTransaction[]> {
     const wallets = await WalletOperations.get();
     let transactions = [];
 
@@ -146,7 +145,7 @@ export class TransactionOperations {
         .toArray();
     }
 
-    return transactions.map(item => this.mapObj(wallets, item));
+    return this.objsNormalizer(transactions.map(item => this.mapObj(wallets, item)));
   }
 
   static async add(transaction: SplurTransaction): Promise<SplurTransaction | null> {
@@ -333,11 +332,17 @@ export class LoanOperations {
   }
 
   static async get(parentId?: number): Promise<SplurTransaction[]> {
+    let transactions = [];
+    const wallets = await WalletOperations.get();
     if (parentId) {
-      return await db.splurTransactions.where("loanId").equals(parentId).toArray();
+      transactions = await db.splurTransactions.where("loanId").equals(parentId).toArray();
+    } else {
+      transactions = await db.splurTransactions.filter(item => item.loanId !== undefined).toArray();
     }
 
-    return await db.splurTransactions.filter(item => item.loanId !== undefined).toArray();
+    return TransactionOperations.objsNormalizer(
+      transactions.map(item => TransactionOperations.mapObj(wallets, item)),
+    );
   }
 
   // Only for Parent loan obj
