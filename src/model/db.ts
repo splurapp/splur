@@ -37,18 +37,29 @@ export interface Wallet {
 export interface SplurTransaction {
   id?: number;
   assignedTo?: number; // WALLET ID (Ex. Cash Wallet, Bank Wallet)
+  assignedToWallet?: Wallet; // Will not be used in DB (will only be used in get)
   timestamp: Date;
   amount: number;
   exchanger?: string; // Person, UPI ID, BANK ACCOUNT One Liner Details, Mobile Number
   exchangeType: ExchangeType; // Credit, Debit, Transfer, Borrow, Lend
   transferFrom?: number; // WALLET ID (Ex. Cash Wallet, Bank Wallet)
+  transferFromWallet?: Wallet; // Will not be used in DB (will only be used in get)
   transferTo?: number; // WALLET ID (Ex. Cash Wallet, Bank Wallet)
+  transferToWallet?: Wallet; // Will not be used in DB (will only be used in get)
   // dismissed?: boolean; // Used for Lend OR BORROW
-  category?: string;
-  subcategory?: string;
+  category_id?: number;
+  category?: Category; // Will not be used in DB (will only be used in get)
+  // subcategory?: string;
   autoCategoryMap: boolean; // For marchant to Category or Sub Category Mapping
   recurringId?: number; // To identify recurring transaction
   loanId?: number; // To identify loan transaction
+}
+
+export interface Category {
+  id?: number;
+  name: string;
+  icon: string;
+  color: string;
 }
 
 // export interface Loan {
@@ -102,6 +113,7 @@ export class MySubClassedDexie extends Dexie {
   user!: Table<User>;
   wallets!: Table<Wallet>;
   splurTransactions!: Table<SplurTransaction>;
+  categories!: Table<Category>
   // loans!: Table<Loan>;
   preferences!: Table<Preferences>;
   categoryMaps!: Table<CategoryMap>;
@@ -113,6 +125,7 @@ export class MySubClassedDexie extends Dexie {
       wallets: "++id, &name",
       user: "&name",
       splurTransactions: "++id, timestamp, assignedTo, transferFrom, loanId",
+      categories: "++id",
       // loans: "++id, timestamp, exchangeType, parent_id",
       preferences: "id",
       categoryMaps: "++id",

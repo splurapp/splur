@@ -10,43 +10,43 @@ interface Props {
 
 type SubCategories = Record<string, string[]>;
 
-const subCategories: SubCategories = {
-  None: ["None"],
-  Food: ["None"],
-  "Bills & Utilities": [
-    "Credit Card Bill",
-    "Mobile Recharge",
-    "Electricity",
-    "Rent",
-    "Water",
-    "Gas",
-    "Tax",
-  ],
-  Shopping: ["None"],
-  Travel: ["None"],
-  Entertainment: ["None"],
-  Medical: ["None"],
-  "Personal Care": ["None"],
-  Education: ["None"],
-  Invest: ["SIP", "FD", "Stocks", "Insurance"],
-  Grocery: ["None"],
-  Others: ["None"],
-};
+// const subCategories: SubCategories = {
+//   None: ["None"],
+//   Food: ["None"],
+//   "Bills & Utilities": [
+//     "Credit Card Bill",
+//     "Mobile Recharge",
+//     "Electricity",
+//     "Rent",
+//     "Water",
+//     "Gas",
+//     "Tax",
+//   ],
+//   Shopping: ["None"],
+//   Travel: ["None"],
+//   Entertainment: ["None"],
+//   Medical: ["None"],
+//   "Personal Care": ["None"],
+//   Education: ["None"],
+//   Invest: ["SIP", "FD", "Stocks", "Insurance"],
+//   Grocery: ["None"],
+//   Others: ["None"],
+// };
 
-const categories = [
-  "None",
-  "Food",
-  "Bills & Utilities",
-  "Shopping",
-  "Travel",
-  "Entertainment",
-  "Medical",
-  "Personal Care",
-  "Education",
-  "Invest",
-  "Grocery",
-  "Others",
-];
+// const categories = [
+//   "None",
+//   "Food",
+//   "Bills & Utilities",
+//   "Shopping",
+//   "Travel",
+//   "Entertainment",
+//   "Medical",
+//   "Personal Care",
+//   "Education",
+//   "Invest",
+//   "Grocery",
+//   "Others",
+// ];
 
 const getExchangeType = (i: string) => {
   if (ExchangeType.BORROW.toString() === i) return ExchangeType.BORROW;
@@ -72,8 +72,6 @@ export default function AddTransaction({ wallet, refreshTransactions }: Props) {
       assignedTo: wallet.id,
       amount: amount,
       autoCategoryMap: true,
-      category: "other",
-      subcategory: "other",
       // dismissed: undefined,
       exchanger: undefined,
       exchangeType: exchangeType,

@@ -28,8 +28,6 @@ export default function Loan() {
       timestamp: new Date(),
       amount: amount,
       autoCategoryMap: false,
-      category: "loan",
-      subcategory: exchangeType === ExchangeType.BORROW ? "borrow" : "lend",
       exchangeType: exchangeType,
     };
     await LoanOperations.create(myLoan);
