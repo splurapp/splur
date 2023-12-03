@@ -1,5 +1,6 @@
-import { IndexableType, IndexableTypeArray } from "dexie";
-import db, { ExchangeType, SplurTransaction, Wallet } from "./db";
+import type { IndexableType, IndexableTypeArray } from "dexie";
+import type { SplurTransaction, Wallet } from "./db";
+import db, { ExchangeType } from "./db";
 import { TransactionOperations } from "./transactionOps";
 
 export class WalletOperations {

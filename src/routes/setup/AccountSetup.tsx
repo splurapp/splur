@@ -1,9 +1,10 @@
 import { APP_NAME } from "@/appConstants";
-import { Wallet, WalletType } from "@/model/db";
+import type { Wallet } from "@/model/db";
 import { WalletOperations } from "@/model/walletOps";
-import { type AsyncReturnType } from "@/types/utils";
+import type { AsyncReturnType } from "@/types/utils";
 import { useState } from "react";
 import { useLoaderData, useNavigate } from "react-router-dom";
+import type { loader } from "./walletLoader";
 
 interface EditWalletModalProps {
   wallet: Wallet;
@@ -94,37 +95,6 @@ function WalletCard({ wallet, onEdit }: { wallet: Wallet; onEdit: (wallet: Walle
       </div>
     </>
   );
-}
-
-const DEFAULT_WALLETS: Wallet[] = [
-  {
-    name: "Bank",
-    type: WalletType.BANK,
-    amount: 0,
-  },
-  {
-    name: "Credit Card",
-    type: WalletType.CREDITCARD,
-    amount: 0,
-  },
-  {
-    name: "Cash",
-    type: WalletType.CASH,
-    amount: 0,
-  },
-];
-
-export async function loader() {
-  let defaultWallets: Wallet[] = DEFAULT_WALLETS;
-  const wallets = await WalletOperations.get();
-
-  if (wallets.length > 0) {
-    defaultWallets = defaultWallets.filter(
-      defaultWallet => wallets.findIndex(wallet => wallet.name === defaultWallet.name) == -1,
-    );
-  }
-
-  return { wallets, defaultWallets };
 }
 
 export default function AccountSetup() {

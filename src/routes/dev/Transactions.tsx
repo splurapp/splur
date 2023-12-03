@@ -1,4 +1,5 @@
-import { ExchangeType, SplurTransaction, Wallet } from "@/model/db";
+import type { SplurTransaction, Wallet } from "@/model/db";
+import { ExchangeType } from "@/model/db";
 import { TransactionOperations } from "@/model/transactionOps";
 import { useEffect, useState } from "react";
 import AddTransaction from "./AddTransaction";

@@ -9,8 +9,9 @@ import Track from "./Track";
 import Accounts from "./accounts";
 import NewAccount from "./accounts/new";
 import Dev from "./dev/Dev";
-import AccountSetup, { loader as walletLoader } from "./setup/AccountSetup";
+import AccountSetup from "./setup/AccountSetup";
 import Hello from "./setup/Hello";
+import { loader as walletLoader } from "./setup/walletLoader";
 
 export const router = createBrowserRouter([
   {

@@ -1,4 +1,5 @@
-import db, { Category } from "./db";
+import type { Category } from "./db";
+import db from "./db";
 
 export class CategoryOperations {
   static getObj(categories: Category[], id: number): Category | undefined {

@@ -1,9 +1,11 @@
 import "fake-indexeddb/auto";
-import { describe, test, expect, beforeEach } from "vitest";
-import { Category, ExchangeType, MySubClassedDexie, Wallet, WalletType } from "../model/db";
-import { WalletOperations } from "@/model/walletOps";
-import { TransactionOperations } from "@/model/transactionOps";
+// import all this after fake indexeddb
 import { CategoryOperations } from "@/model/categoryOps";
+import { TransactionOperations } from "@/model/transactionOps";
+import { WalletOperations } from "@/model/walletOps";
+import { beforeEach, describe, expect, test } from "vitest";
+import type { Category, Wallet } from "../model/db";
+import { ExchangeType, MySubClassedDexie, WalletType } from "../model/db";
 
 const db = new MySubClassedDexie("testDatabase");
 beforeEach(async () => {
@@ -40,7 +42,7 @@ describe("Wallet Operations", () => {
   });
 });
 
-describe("Category Operations", async () => {
+describe("Category Operations", () => {
   test("Category add", async () => {
     const category: Category = {
       name: "Food",

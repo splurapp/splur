@@ -8,7 +8,8 @@
     "build": "rimraf dist && tsc && vite build",
     "preview": "vite preview",
     "test": "vitest",
-    "format": "prettier . --write"
+    "format": "prettier . --write",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0"
   },
   "dependencies": {
     "dexie": "^3.2.4",
@@ -27,6 +28,8 @@
     "autoprefixer": "^10.4.16",
     "daisyui": "^3.9.4",
     "eslint": "^8.54.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.5",
     "fake-indexeddb": "^5.0.1",
     "postcss": "^8.4.31",
     "prettier": "^3.0.3",

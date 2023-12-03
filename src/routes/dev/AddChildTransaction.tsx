@@ -1,4 +1,5 @@
-import { ExchangeType, SplurTransaction } from "@/model/db";
+import type { SplurTransaction } from "@/model/db";
+import { ExchangeType } from "@/model/db";
 import { LoanOperations } from "@/model/transactionOps";
 import { useState } from "react";
 

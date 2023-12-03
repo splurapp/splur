@@ -1,7 +1,8 @@
-import { IndexableType } from "dexie";
-import db, { Category, ExchangeType, SplurTransaction, Wallet } from "./db";
-import { WalletOperations } from "./walletOps";
+import type { IndexableType } from "dexie";
 import { CategoryOperations } from "./categoryOps";
+import type { Category, SplurTransaction, Wallet } from "./db";
+import db, { ExchangeType } from "./db";
+import { WalletOperations } from "./walletOps";
 
 export class TransactionOperations {
   static mapObj(
