@@ -18,7 +18,7 @@ export class WalletOperations {
   }
 
   static async create(wallet: Wallet): Promise<Wallet | null> {
-    return await db.transaction("rw", db.wallets, db.splurTransactions, async () => {
+    return await db.transaction("rw", db.wallets, db.splurTransactions, db.categories, async () => {
       try {
         const newWallet: Wallet = {
           ...wallet,
@@ -98,7 +98,7 @@ export class WalletOperations {
 
   static async edit(wallet: Wallet): Promise<Wallet | null> {
     // TODO: return updated wallet, instead of boolean
-    return await db.transaction("rw", db.wallets, db.splurTransactions, async () => {
+    return await db.transaction("rw", db.wallets, db.splurTransactions, db.categories, async () => {
       try {
         const currWallet = await db.wallets.get(wallet.id as IndexableType);
 

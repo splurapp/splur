@@ -1,6 +1,10 @@
 import db, { Category } from "./db";
 
 export class CategoryOperations {
+  static getObj(categories: Category[], id: number): Category | undefined {
+    return categories.find(item => item.id === id);
+  }
+
   static async get(): Promise<Category[]> {
     return await db.categories.toArray();
   }
