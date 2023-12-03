@@ -77,7 +77,7 @@ function EditWalletModal({ isOpen, onSave, wallet, onClose }: EditWalletModalPro
 function WalletCard({ wallet, onEdit }: { wallet: Wallet; onEdit: (wallet: Wallet) => void }) {
   return (
     <>
-      <div className="card join-item bg-primary text-primary-content">
+      <div className="card join-item bg-primary">
         <div className="card-body flex-row justify-between">
           <div>
             <h2 className="card-title">{wallet.name}</h2>
@@ -184,11 +184,9 @@ export default function AccountSetup() {
         )}
       </section>
 
-      <section className="join join-vertical mt-auto">
-        <button onClick={completeSetup} className="btn btn-primary join-item w-full">
-          Complete
-        </button>
-      </section>
+      <button onClick={completeSetup} className="btn btn-primary mt-auto w-full">
+        Complete
+      </button>
     </main>
   );
 }
