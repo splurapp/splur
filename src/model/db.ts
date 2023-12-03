@@ -47,7 +47,7 @@ export interface SplurTransaction {
   transferTo?: number; // WALLET ID (Ex. Cash Wallet, Bank Wallet)
   transferToWallet?: Wallet; // Will not be used in DB (will only be used in get)
   // dismissed?: boolean; // Used for Lend OR BORROW
-  category_id?: number;
+  categoryId?: number;
   category?: Category; // Will not be used in DB (will only be used in get)
   // subcategory?: string;
   autoCategoryMap: boolean; // For marchant to Category or Sub Category Mapping
@@ -121,11 +121,11 @@ export class MySubClassedDexie extends Dexie {
 
   constructor(databaseName?: string) {
     super(databaseName ?? "splur");
-    this.version(1).stores({
+    this.version(2).stores({
       wallets: "++id, &name",
       user: "&name",
-      splurTransactions: "++id, timestamp, assignedTo, transferFrom, loanId",
-      categories: "++id",
+      splurTransactions: "++id, timestamp, assignedTo, transferFrom, loanId, categoryId",
+      categories: "++id, &name",
       // loans: "++id, timestamp, exchangeType, parent_id",
       preferences: "id",
       categoryMaps: "++id",
