@@ -3,7 +3,9 @@ import { createBrowserRouter, redirect } from "react-router-dom";
 import About from "./About";
 import Borrowing from "./Borrowing";
 import Home from "./Home";
+import LayoutWithNav from "./LayoutWithNav";
 import Notifications from "./Notifications";
+import Reports from "./Reports";
 import Settings from "./Settings";
 import Track from "./Track";
 import Accounts from "./accounts";
@@ -28,20 +30,19 @@ export const router = createBrowserRouter([
     },
     children: [
       {
-        index: true,
-        element: <Home />,
-      },
-      {
-        path: "setup",
+        element: <LayoutWithNav />,
         children: [
           {
             index: true,
-            element: <Hello />,
+            element: <Home />,
           },
           {
-            path: "account",
-            element: <AccountSetup />,
-            loader: walletLoader,
+            path: "reports",
+            element: <Reports />,
+          },
+          {
+            path: "settings",
+            element: <Settings />,
           },
         ],
       },
@@ -67,16 +68,26 @@ export const router = createBrowserRouter([
         element: <Borrowing />,
       },
       {
-        path: "settings",
-        element: <Settings />,
-      },
-      {
         path: "notifications",
         element: <Notifications />,
       },
       {
         path: "about",
         element: <About />,
+      },
+      {
+        path: "setup",
+        children: [
+          {
+            index: true,
+            element: <Hello />,
+          },
+          {
+            path: "account",
+            element: <AccountSetup />,
+            loader: walletLoader,
+          },
+        ],
       },
     ],
   },

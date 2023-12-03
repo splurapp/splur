@@ -1,6 +1,6 @@
 export default function Home() {
   return (
-    <div className="m-5">
+    <div className="mt-5 flex justify-center">
       <div className="stats bg-primary text-primary-content">
         <div className="stat">
           <div className="stat-title">Income</div>
