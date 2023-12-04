@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function Hello() {
   const installEvent = useRef<BeforeInstallPromptEvent | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const navigate = useNavigate();
 
   const handlePwaInstall = async () => {
     if (!installEvent.current) {
@@ -15,8 +16,11 @@ export default function Hello() {
     if (result.outcome === "accepted") {
       setIsModalOpen(false);
       installEvent.current = null;
+      if (/Android|webOS|iPhone|iPad|iPod|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+        navigate("/install-done");
+      }
     } else {
-      console.log("Installtion denied!");
+      console.log("Installation denied!");
     }
   };
 

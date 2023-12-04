@@ -17,6 +17,9 @@ export default defineConfig({
         short_name: "Splur",
         description: "An open source personal expense manager app",
         theme_color: "#14b8a5",
+        start_url: "/",
+        scope: ".",
+        display: "standalone",
         icons: [
           {
             src: "pwa-64x64.png",

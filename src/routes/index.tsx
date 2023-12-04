@@ -5,6 +5,7 @@ import Borrowing from "./Borrowing";
 import Home from "./Home";
 import LayoutWithNav from "./LayoutWithNav";
 import Notifications from "./Notifications";
+import PWAInstallDone from "./PWAInstallDone";
 import Reports from "./Reports";
 import Settings from "./Settings";
 import Track from "./Track";
@@ -88,6 +89,10 @@ export const router = createBrowserRouter([
             loader: walletLoader,
           },
         ],
+      },
+      {
+        path: "install-done",
+        element: <PWAInstallDone />,
       },
     ],
   },
