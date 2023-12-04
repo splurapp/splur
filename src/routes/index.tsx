@@ -2,7 +2,6 @@ import { isInitialSetupDone } from "@/lib/app";
 import { createBrowserRouter, redirect } from "react-router-dom";
 import About from "./About";
 import Borrowing from "./Borrowing";
-import Home from "./Home";
 import LayoutWithNav from "./LayoutWithNav";
 import Notifications from "./Notifications";
 import PWAInstallDone from "./PWAInstallDone";
@@ -12,6 +11,8 @@ import Track from "./Track";
 import Accounts from "./accounts";
 import NewAccount from "./accounts/new";
 import Dev from "./dev/Dev";
+import Home from "./home";
+import { loader as transactionLoader } from "./home/transaction-loader";
 import AccountSetup from "./setup/AccountSetup";
 import Hello from "./setup/Hello";
 import { loader as walletLoader } from "./setup/walletLoader";
@@ -36,6 +37,7 @@ export const router = createBrowserRouter([
           {
             index: true,
             element: <Home />,
+            loader: transactionLoader,
           },
           {
             path: "reports",
