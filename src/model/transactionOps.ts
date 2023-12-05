@@ -46,7 +46,8 @@ export class TransactionOperations {
         .equals(walletId)
         .or("transferFrom")
         .equals(walletId)
-        .toArray();
+        .reverse()
+        .sortBy("timestamp");
     } else {
       transactions = await db.splurTransactions.toArray();
     }
@@ -64,6 +65,7 @@ export class TransactionOperations {
     return this.mapObj(wallets, categories, transaction);
   }
 
+  // WIP
   static async bulkGet(walletIds: number[]): Promise<SplurTransaction[]> {
     if (walletIds?.length > 0) {
       const wallets = await WalletOperations.get();
@@ -87,12 +89,14 @@ export class TransactionOperations {
         .where("timestamp")
         .between(startOfYear, endOfYear, true, true)
         .and(record => record.assignedTo === walletId)
-        .toArray();
+        .reverse()
+        .sortBy("timestamp");
     } else {
       transactions = await db.splurTransactions
         .where("timestamp")
         .between(startOfYear, endOfYear, true, true)
-        .toArray();
+        .reverse()
+        .sortBy("timestamp");
     }
 
     return this.objsNormalizer(transactions.map(item => this.mapObj(wallets, categories, item)));
@@ -110,12 +114,14 @@ export class TransactionOperations {
         .where("timestamp")
         .between(startOfMonth, endOfMonth, true, true)
         .and(record => record.assignedTo === walletId)
-        .toArray();
+        .reverse()
+        .sortBy("timestamp");
     } else {
       transactions = await db.splurTransactions
         .where("timestamp")
         .between(startOfMonth, endOfMonth, true, true)
-        .toArray();
+        .reverse()
+        .sortBy("timestamp");
     }
 
     return this.objsNormalizer(transactions.map(item => this.mapObj(wallets, categories, item)));
@@ -131,7 +137,8 @@ export class TransactionOperations {
         .where("timestamp")
         .equals(date)
         .and(record => record.assignedTo === walletId)
-        .toArray();
+        .reverse()
+        .sortBy("timestamp");
     } else {
       transactions = await db.splurTransactions.where("timestamp").equals(date).toArray();
     }
@@ -153,12 +160,14 @@ export class TransactionOperations {
         .where("timestamp")
         .between(startDate, endDate, true, true)
         .and(record => record.assignedTo === walletId)
-        .toArray();
+        .reverse()
+        .sortBy("timestamp");
     } else {
       transactions = await db.splurTransactions
         .where("timestamp")
         .between(startDate, endDate, true, true)
-        .toArray();
+        .reverse()
+        .sortBy("timestamp");
     }
 
     return this.objsNormalizer(transactions.map(item => this.mapObj(wallets, categories, item)));
@@ -354,9 +363,16 @@ export class LoanOperations {
     const wallets = await WalletOperations.get();
     const categories = await CategoryOperations.get();
     if (parentId) {
-      transactions = await db.splurTransactions.where("loanId").equals(parentId).toArray();
+      transactions = await db.splurTransactions
+        .where("loanId")
+        .equals(parentId)
+        .reverse()
+        .sortBy("timestamp");
     } else {
-      transactions = await db.splurTransactions.filter(item => item.loanId !== undefined).toArray();
+      transactions = await db.splurTransactions
+        .filter(item => item.loanId !== undefined)
+        .reverse()
+        .sortBy("timestamp");
     }
 
     return TransactionOperations.objsNormalizer(

@@ -34,6 +34,7 @@ export class WalletOperations {
             assignedTo: walletId,
             amount: wallet.amount,
             autoCategoryMap: false,
+            title: "Adjust balance",
             // dismissed: undefined,
             exchanger: undefined,
             exchangeType: ExchangeType.CREDIT,
@@ -118,6 +119,7 @@ export class WalletOperations {
                 ? wallet.amount - currWallet.amount
                 : currWallet.amount - wallet.amount,
             autoCategoryMap: false,
+            title: "Adjust balance",
             // dismissed: undefined,
             exchanger: undefined,
             exchangeType:
