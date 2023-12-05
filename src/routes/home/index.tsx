@@ -7,7 +7,7 @@ import type { loader } from "./transaction-loader";
 
 function TransactionsCard({ data }: { data: SplurTransaction }) {
   return (
-    <div className="card join-item card-bordered card-compact shadow-lg">
+    <div className="card-compact card card-bordered join-item shadow-lg">
       <div className="card-body flex-row gap-3">
         <div className="rounded-lg bg-primary p-5">
           <svg

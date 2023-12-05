@@ -15,7 +15,7 @@ export default function PWAInstallDone() {
 
   return (
     <main className="flex h-[100dvh] w-full flex-col items-center justify-center bg-primary px-3">
-      <div className="card border  border-primary-content shadow-xl">
+      <div className="card border border-primary-content shadow-xl">
         <div className="card-body">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -38,12 +38,14 @@ export default function PWAInstallDone() {
             You can now access it from your home screen.
           </p>
           <div className="card-actions">
-            <button className={`btn btn-neutral w-full ${installing ? "disabled" : ""}`}>
-              {installing && <span className="loading loading-dots"></span>}
-              <a href={window.location.origin} target="_blank">
-                {installing ? "Installing" : "Open PWA"}
-              </a>
-            </button>
+            <a
+              className={`btn btn-neutral w-full ${installing ? "disabled" : ""}`}
+              href={window.location.origin}
+              target="_blank"
+            >
+              {installing && <span className="loading loading-dots" />}
+              {installing ? "Installing" : "Open PWA"}
+            </a>
           </div>
         </div>
       </div>

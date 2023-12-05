@@ -1,4 +1,5 @@
 import { APP_NAME } from "@/appConstants";
+import { formatCurrency } from "@/lib/currency";
 import type { Wallet } from "@/model/db";
 import { WalletOperations } from "@/model/walletOps";
 import type { AsyncReturnType } from "@/types/utils";
@@ -81,7 +82,7 @@ function WalletCard({ wallet, onEdit }: { wallet: Wallet; onEdit: (wallet: Walle
         <div className="card-body flex-row justify-between">
           <div>
             <h2 className="card-title">{wallet.name}</h2>
-            <p>{wallet.amount.toLocaleString("en-IN", { style: "currency", currency: "INR" })}</p>
+            <p>{formatCurrency(wallet.amount)}</p>
           </div>
           <button className="btn btn-circle btn-ghost" onClick={() => onEdit(wallet)}>
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
