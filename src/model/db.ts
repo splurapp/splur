@@ -41,6 +41,8 @@ export interface SplurTransaction {
   assignedToWallet?: Wallet; // Will not be used in DB (will only be used in get)
   timestamp: Date;
   amount: number;
+  title?: string;
+  desc?: string;
   exchanger?: string; // Person, UPI ID, BANK ACCOUNT One Liner Details, Mobile Number
   exchangeType: ExchangeType; // Credit, Debit, Transfer, Borrow, Lend
   transferFrom?: number; // WALLET ID (Ex. Cash Wallet, Bank Wallet)
