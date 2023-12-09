@@ -11,7 +11,7 @@ export class CategoryOperations {
   }
 
   static async getById(id?: number): Promise<Category | undefined> {
-    if (!id) return undefined;
+    if (!id) throw new Error("ID not provided");
     return await db.categories.get(id);
   }
 
@@ -27,12 +27,13 @@ export class CategoryOperations {
         return newCategory;
       } catch (error) {
         console.log(error);
-        return null;
+        // return null;
+        throw error;
       }
     });
   }
 
-  static async bulkAdd(categories: Category[]): Promise<boolean | null> {
+  static async bulkAdd(categories: Category[]): Promise<boolean> {
     return db.transaction("rw", db.categories, async () => {
       try {
         const objs = categories.map(item => {
@@ -47,12 +48,13 @@ export class CategoryOperations {
         return true;
       } catch (error) {
         console.log(error);
-        return null;
+        // return null;
+        throw error;
       }
     });
   }
 
-  static async edit(category: Category): Promise<Category | null> {
+  static async edit(category: Category): Promise<Category> {
     return db.transaction("rw", db.categories, async () => {
       try {
         if (!category.id) throw new Error("No id provided inside category object");
@@ -64,15 +66,18 @@ export class CategoryOperations {
         });
 
         const newCategory = await this.getById(category.id);
-        return newCategory ? newCategory : null;
+
+        if (newCategory) newCategory;
+        throw new Error("Category creation failed");
       } catch (error) {
         console.log(error);
-        return null;
+        // return null;
+        throw error;
       }
     });
   }
 
-  static async delete(categoryId?: number): Promise<number | null> {
+  static async delete(categoryId?: number): Promise<number> {
     return db.transaction("rw", db.categories, db.splurTransactions, async () => {
       try {
         if (!categoryId) throw new Error("No id provided");
@@ -90,7 +95,8 @@ export class CategoryOperations {
         return categoryId;
       } catch (error) {
         console.log(error);
-        return null;
+        // return null;
+        throw error;
       }
     });
   }
