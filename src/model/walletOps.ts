@@ -51,7 +51,8 @@ export class WalletOperations {
         return updatedWallet ? updatedWallet : null;
       } catch (error) {
         console.log(error);
-        return null;
+        // return null;
+        throw error;
       }
     });
   }
@@ -85,7 +86,8 @@ export class WalletOperations {
               return id;
             } catch (error) {
               console.log(error);
-              return null;
+              // return null;
+              throw error;
             }
           });
         }
@@ -93,7 +95,8 @@ export class WalletOperations {
         return id;
       } catch (error) {
         console.log(error);
-        return null;
+        // return null;
+        throw error;
       }
     });
   }
@@ -137,7 +140,8 @@ export class WalletOperations {
         return ret === 1 && updatedWallet ? updatedWallet : null;
       } catch (error) {
         console.log(error);
-        return null;
+        // return null;
+        throw error;
       }
     });
   }
@@ -221,7 +225,8 @@ export class WalletOperations {
         }
       } catch (error) {
         console.log(error);
-        return false;
+        // return false;
+        throw error;
       }
     });
   }
@@ -230,8 +235,10 @@ export class WalletOperations {
     try {
       await db.wallets.clear();
       return true;
-    } catch {
-      return false;
+    } catch (error) {
+      console.log(error);
+      // return false;
+      throw error;
     }
   }
 }
