@@ -31,6 +31,8 @@ export interface User {
 export interface Wallet {
   id?: number;
   name: string;
+  color?: string;
+  icon?: string;
   type: string;
   amount: number;
 }
