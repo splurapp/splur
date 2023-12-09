@@ -20,7 +20,12 @@ const DEFAULT_WALLETS: Wallet[] = [
   },
 ];
 
-export async function loader() {
+export interface LoaderData {
+  wallets: Wallet[];
+  defaultWallets: Wallet[];
+}
+
+export async function loader(): Promise<LoaderData> {
   let defaultWallets: Wallet[] = DEFAULT_WALLETS;
 
   const wallets = await WalletOperations.get();

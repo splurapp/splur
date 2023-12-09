@@ -7,9 +7,10 @@ module.exports = {
     "plugin:@typescript-eslint/recommended-type-checked",
     "plugin:@typescript-eslint/stylistic-type-checked",
     "plugin:react-hooks/recommended",
+    "plugin:jsx-a11y/recommended",
   ],
   parser: "@typescript-eslint/parser",
-  plugins: ["@typescript-eslint", "react-refresh"],
+  plugins: ["@typescript-eslint", "react-refresh", "jsx-a11y"],
   rules: {
     "react-refresh/only-export-components": ["warn", { allowConstantExport: true }],
     "@typescript-eslint/consistent-type-exports": "error",
