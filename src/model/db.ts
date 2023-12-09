@@ -3,9 +3,9 @@ import Dexie from "dexie";
 
 // ENUMS
 export enum ExchangeType {
-  CREDIT = "CR",
-  DEBIT = "DR",
-  TRANSFER = "TRF",
+  CREDIT = "Income",
+  DEBIT = "Expense",
+  TRANSFER = "Transfer",
   LEND = "LND",
   SUB_LEND = "SLND",
   BORROW = "BRW",
@@ -14,13 +14,14 @@ export enum ExchangeType {
 
 export enum Currency {
   INR = "INR",
-  USDOLLER = "USDOLLER",
+  USD = "USD",
+  EUR = "EUR",
 }
 
 export enum WalletType {
-  CASH = "CASH",
-  BANK = "BANK",
-  CREDITCARD = "CREDITCARD",
+  CASH = "Cash",
+  BANK = "Bank",
+  CREDIT_CARD = "Credit Card",
 }
 
 export interface User {

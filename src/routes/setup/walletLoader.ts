@@ -10,7 +10,7 @@ const DEFAULT_WALLETS: Wallet[] = [
   },
   {
     name: "Credit Card",
-    type: WalletType.CREDITCARD,
+    type: WalletType.CREDIT_CARD,
     amount: 0,
   },
   {
