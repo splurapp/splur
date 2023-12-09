@@ -2,9 +2,9 @@ import { NavLink, Outlet } from "react-router-dom";
 
 export default function LayoutWithNav() {
   return (
-    <div>
+    <>
       <Outlet />
-      <nav className="btm-nav btm-nav-sm">
+      <nav className="btm-nav btm-nav-sm absolute">
         <NavLink to="/">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -51,6 +51,6 @@ export default function LayoutWithNav() {
           <span className="btm-nav-label">Others</span>
         </NavLink>
       </nav>
-    </div>
+    </>
   );
 }

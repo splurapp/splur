@@ -1,13 +1,12 @@
-import type { AsyncReturnType } from "@/types/utils";
+import type { SplurTransaction } from "@/model/db";
 import { Link, useLoaderData } from "react-router-dom";
 import TransactionsCard from "./TransactionsCard";
-import type { loader } from "./transaction-loader";
 
 export default function Home() {
-  const transactions = useLoaderData() as AsyncReturnType<typeof loader>;
+  const transactions = useLoaderData() as SplurTransaction[];
 
   return (
-    <main className="p-3">
+    <main>
       <section>
         <h1 className="text-xl">Recent transactions</h1>
         <div className="join join-vertical w-full gap-2 rounded-md">
@@ -16,8 +15,8 @@ export default function Home() {
           ))}
         </div>
       </section>
-      <Link to="track">
-        <button className="btn btn-circle btn-primary btn-lg fixed bottom-20 right-3">
+      <Link to="track" title="Add transaction icon">
+        <button className="btn btn-circle btn-primary btn-lg absolute bottom-20 right-3">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             className="h-8 w-8"

@@ -1,13 +1,13 @@
 import { isInitialSetupDone } from "@/lib/app";
 import { createBrowserRouter, redirect } from "react-router-dom";
 import About from "./About";
+import AppLayout from "./AppLayout";
 import Borrowing from "./Borrowing";
 import LayoutWithNav from "./LayoutWithNav";
 import Notifications from "./Notifications";
 import PWAInstallDone from "./PWAInstallDone";
 import Reports from "./Reports";
 import Settings from "./Settings";
-import Track from "./Track";
 import Accounts from "./accounts";
 import NewAccount from "./accounts/new";
 import Dev from "./dev/Dev";
@@ -32,51 +32,64 @@ export const router = createBrowserRouter([
     },
     children: [
       {
-        element: <LayoutWithNav />,
+        element: <AppLayout />,
         children: [
           {
-            index: true,
-            element: <Home />,
-            loader: transactionLoader,
+            element: <LayoutWithNav />,
+            children: [
+              {
+                index: true,
+                element: <Home />,
+                loader: transactionLoader,
+              },
+              {
+                path: "reports",
+                element: <Reports />,
+              },
+              {
+                path: "settings",
+                element: <Settings />,
+              },
+            ],
           },
           {
-            path: "reports",
-            element: <Reports />,
+            path: "track/:id?",
+            lazy: () => import("./track"),
+            async loader({ params, request }) {
+              const { loader } = await import("./track/track-loader");
+              return loader({ params, request });
+            },
           },
           {
-            path: "settings",
-            element: <Settings />,
+            path: "accounts",
+            children: [
+              {
+                index: true,
+                element: <Accounts />,
+              },
+              {
+                path: "new",
+                element: <NewAccount />,
+              },
+            ],
+          },
+          {
+            path: "borrowing",
+            element: <Borrowing />,
+          },
+          {
+            path: "notifications",
+            element: <Notifications />,
+          },
+          {
+            path: "about",
+            element: <About />,
+          },
+          {
+            path: "install-done",
+            element: <PWAInstallDone />,
           },
         ],
-      },
-      {
-        path: "track",
-        element: <Track />,
-      },
-      {
-        path: "accounts",
-        children: [
-          {
-            index: true,
-            element: <Accounts />,
-          },
-          {
-            path: "new",
-            element: <NewAccount />,
-          },
-        ],
-      },
-      {
-        path: "borrowing",
-        element: <Borrowing />,
-      },
-      {
-        path: "notifications",
-        element: <Notifications />,
-      },
-      {
-        path: "about",
-        element: <About />,
       },
       {
         path: "setup",
@@ -91,10 +104,6 @@ export const router = createBrowserRouter([
             loader: walletLoader,
           },
         ],
-      },
-      {
-        path: "install-done",
-        element: <PWAInstallDone />,
       },
     ],
   },

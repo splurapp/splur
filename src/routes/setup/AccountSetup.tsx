@@ -2,10 +2,9 @@ import { APP_NAME } from "@/appConstants";
 import { formatCurrency } from "@/lib/currency";
 import type { Wallet } from "@/model/db";
 import { WalletOperations } from "@/model/walletOps";
-import type { AsyncReturnType } from "@/types/utils";
 import { useState } from "react";
 import { useLoaderData, useNavigate } from "react-router-dom";
-import type { loader } from "./walletLoader";
+import type { LoaderData } from "./walletLoader";
 
 interface EditWalletModalProps {
   wallet: Wallet;
@@ -24,13 +23,14 @@ function EditWalletModal({ isOpen, onSave, wallet, onClose }: EditWalletModalPro
         <h1 className="text-lg">Edit Wallet</h1>
 
         <div className="form-control w-full">
-          <label className="label">
+          <label htmlFor="wallet" className="label">
             <span className="label-text">Name</span>
           </label>
           <input
-            autoFocus
             type="text"
-            placeholder="your wallet name"
+            name="wallet"
+            id="wallet"
+            placeholder="Enter wallet name"
             className="input input-bordered input-primary"
             value={editedName}
             onChange={e => setEditedName(e.target.value)}
@@ -38,12 +38,17 @@ function EditWalletModal({ isOpen, onSave, wallet, onClose }: EditWalletModalPro
         </div>
 
         <div className="form-control w-full">
-          <label className="label">
+          <label htmlFor="amount" className="label">
             <span className="label-text">Amount</span>
           </label>
           <input
+            // eslint-disable-next-line jsx-a11y/no-autofocus
+            autoFocus
             type="number"
-            placeholder="wallet amount"
+            min={0}
+            name="amount"
+            id="amount"
+            placeholder="Enter amount"
             className="input input-bordered input-primary"
             value={editedAmount}
             onChange={e => setEditedAmount(Number(e.target.value))}
@@ -100,7 +105,7 @@ function WalletCard({ wallet, onEdit }: { wallet: Wallet; onEdit: (wallet: Walle
 
 export default function AccountSetup() {
   const navigate = useNavigate();
-  const loaderData = useLoaderData() as AsyncReturnType<typeof loader>;
+  const loaderData = useLoaderData() as LoaderData;
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [wallets, setWallets] = useState<Wallet[]>(loaderData.wallets);
   const [defaultWallets, setDefaultWallets] = useState<Wallet[]>(loaderData.defaultWallets);
@@ -134,7 +139,7 @@ export default function AccountSetup() {
   }
 
   return (
-    <main className="flex h-[100dvh] flex-col gap-5 px-5 py-6">
+    <main className="flex h-[100svh] flex-col gap-5 px-5 py-6">
       <section>
         <h1 className="text-4xl font-medium">Let's setup your account!</h1>
         <p>Account can be your bank, credit card or your wallet</p>
