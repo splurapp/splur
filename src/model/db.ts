@@ -61,7 +61,7 @@ export interface SplurTransaction {
   categoryId?: number;
   category?: Category; // Will not be used in DB (will only be used in get)
   // subcategory?: string;
-  autoCategoryMap: boolean; // For marchant to Category or Sub Category Mapping
+  autoCategoryMap?: boolean; // For marchant to Category or Sub Category Mapping
   recurringId?: number; // To identify recurring transaction
   loanId?: number; // To identify loan transaction
 }
@@ -73,47 +73,11 @@ export interface Category {
   color: string;
 }
 
-export interface ScheduledTransaction {
-  id?: number;
-  assignedTo?: number;
-  assignedToWallet?: Wallet;
-  timestamp: Date;
-  amount: number;
-  title?: string;
-  desc?: string;
-  exchanger?: string;
-  exchangeType: ExchangeType;
-  transferFrom?: number;
-  transferFromWallet?: Wallet;
-  transferTo?: number;
-  transferToWallet?: Wallet;
-  categoryId?: number;
-  category?: Category;
-  autoCategoryMap: boolean;
-  loanId?: number;
-  // Specific to scheduled transaction
+type refinedSplurTransaction = Omit<SplurTransaction, "recurringId">;
+export interface ScheduledTransaction extends refinedSplurTransaction {
   frequency: FrequencyType;
   jobHistory: Date[];
   blacklist: Date[];
-}
-
-// export interface Loan {
-//   id?: number;
-//   timestamp: Date;
-//   amount: number;
-//   exchangeType: ExchangeType; // Borrow, Lend, Sub Borrow, Sub Lend
-//   recurring_id?: any; // To identify recurring transaction
-//   assignedTo?: number;
-//   transaction_exists: boolean | true;
-//   parent_id?: any; // To identify parent of current transaction
-// }
-
-export interface Preferences {
-  id?: number;
-  currency: Currency | Currency.INR;
-
-  // Application stuff
-  theme: string;
 }
 
 export interface CategoryMap {
@@ -150,8 +114,6 @@ export class MySubClassedDexie extends Dexie {
   splurTransactions!: Table<SplurTransaction>;
   scheduledTransactions!: Table<ScheduledTransaction>;
   categories!: Table<Category>;
-  // loans!: Table<Loan>;
-  preferences!: Table<Preferences>;
   categoryMaps!: Table<CategoryMap>;
   importStatementConfigs!: Table<ImportStatementConfig>;
 
@@ -163,7 +125,6 @@ export class MySubClassedDexie extends Dexie {
       splurTransactions: "++id, timestamp, assignedTo, transferFrom, loanId, categoryId",
       scheduledTransactions: "++id, timestamp, assignedTo, transferFrom",
       categories: "++id, &name",
-      // loans: "++id, timestamp, exchangeType, parent_id",
       preferences: "id",
       categoryMaps: "++id",
       importStatementConfigs: "&name",
