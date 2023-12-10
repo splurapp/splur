@@ -49,7 +49,7 @@ export class TransactionOperations {
         .reverse()
         .sortBy("timestamp");
     } else {
-      transactions = await db.splurTransactions.toArray();
+      transactions = await db.splurTransactions.reverse().sortBy("timestamp");
     }
 
     return this.objsNormalizer(transactions.map(item => this.mapObj(wallets, categories, item)));
@@ -236,6 +236,7 @@ export class TransactionOperations {
         }
         return true;
       } catch (error) {
+        console.log(error);
         // return false;
         throw error;
       }
@@ -349,6 +350,7 @@ export class TransactionOperations {
         await db.splurTransactions.bulkDelete(transactionIdsWithoutLoan);
         return true;
       } catch (error) {
+        console.log(error);
         // return false;
         throw error;
       }
