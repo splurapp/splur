@@ -1,5 +1,5 @@
 import { formatCurrency } from "@/lib/currency";
-import type { Wallet } from "@/model/db";
+import type { Wallet } from "@/model/schema";
 
 interface WalletCardProps {
   wallet: Wallet;

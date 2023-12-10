@@ -1,4 +1,4 @@
-import type { Wallet } from "@/model/db";
+import type { Wallet } from "@/model/schema";
 import { WalletOperations } from "@/model/walletOps";
 import { useState } from "react";
 

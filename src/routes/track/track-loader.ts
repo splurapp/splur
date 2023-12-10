@@ -1,4 +1,5 @@
-import type { SplurTransaction, Wallet } from "@/model/db";
+import type { SplurTransaction } from "@/model/db";
+import type { Wallet } from "@/model/schema";
 import { TransactionOperations } from "@/model/transactionOps";
 import { WalletOperations } from "@/model/walletOps";
 import type { LoaderFunctionArgs } from "react-router-dom";

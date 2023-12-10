@@ -1,10 +1,11 @@
 import "fake-indexeddb/auto";
 // import all this after fake indexeddb
 import { CategoryOperations } from "@/model/categoryOps";
+import type { Wallet } from "@/model/schema";
 import { TransactionOperations } from "@/model/transactionOps";
 import { WalletOperations } from "@/model/walletOps";
 import { beforeEach, describe, expect, test } from "vitest";
-import type { Category, Wallet } from "../model/db";
+import type { Category } from "../model/db";
 import { ExchangeType, MySubClassedDexie, WalletType } from "../model/db";
 
 const db = new MySubClassedDexie("testDatabase");

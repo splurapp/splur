@@ -1,6 +1,7 @@
 import type { IndexableType, IndexableTypeArray } from "dexie";
-import type { SplurTransaction, Wallet } from "./db";
+import type { SplurTransaction } from "./db";
 import db, { ExchangeType } from "./db";
+import type { Wallet } from "./schema";
 import { TransactionOperations } from "./transactionOps";
 
 export class WalletOperations {
@@ -18,14 +19,12 @@ export class WalletOperations {
     return await db.wallets.toArray();
   }
 
-  static async create(wallet: Wallet): Promise<Wallet | null> {
+  static async create(wallet: Wallet): Promise<Wallet | undefined> {
     return await db.transaction("rw", db.wallets, db.splurTransactions, db.categories, async () => {
       try {
-        const newWallet: Wallet = {
-          ...wallet,
-          amount: 0,
-        };
+        const newWallet: Wallet = { ...wallet, amount: 0 };
         const walletId = (await db.wallets.add(newWallet)) as number;
+        if (!walletId) throw new Error("Wallet creation failed");
 
         if (wallet.amount !== 0) {
           // New Transaction need to be created
@@ -46,9 +45,7 @@ export class WalletOperations {
         }
 
         // gets updated wallet
-        if (!walletId) throw new Error("Wallet creation failed");
-        const updatedWallet = await WalletOperations.getById(walletId);
-        return updatedWallet ? updatedWallet : null;
+        return await WalletOperations.getById(walletId);
       } catch (error) {
         console.log(error);
         // return null;
@@ -102,7 +99,6 @@ export class WalletOperations {
   }
 
   static async edit(wallet: Wallet): Promise<Wallet | null> {
-    // TODO: return updated wallet, instead of boolean
     return await db.transaction("rw", db.wallets, db.splurTransactions, db.categories, async () => {
       try {
         const currWallet = await db.wallets.get(wallet.id as IndexableType);

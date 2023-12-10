@@ -1,5 +1,6 @@
 import type { Table } from "dexie";
 import Dexie from "dexie";
+import type { Wallet } from "./schema";
 
 // ENUMS
 export enum ExchangeType {
@@ -27,15 +28,6 @@ export enum WalletType {
 export interface User {
   name: string;
   photo: Blob | null;
-}
-
-export interface Wallet {
-  id?: number;
-  name: string;
-  color?: string;
-  icon?: string;
-  type: string;
-  amount: number;
 }
 
 export interface SplurTransaction {
