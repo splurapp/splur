@@ -1,8 +1,8 @@
 import type { IndexableType } from "dexie";
 import { CategoryOperations } from "./categoryOps";
-import type { Category, SplurTransaction } from "./db";
+import type { SplurTransaction } from "./db";
 import db, { ExchangeType } from "./db";
-import type { Wallet } from "./schema";
+import type { Category, Wallet } from "./schema";
 import { WalletOperations } from "./walletOps";
 
 export class TransactionOperations {

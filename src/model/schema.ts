@@ -10,3 +10,12 @@ export const walletSchema = z.object({
 });
 
 export type Wallet = z.infer<typeof walletSchema>;
+
+export const categorySchema = z.object({
+  id: z.coerce.number().optional(),
+  name: z.string().min(2).max(50),
+  icon: z.string().emoji(),
+  color: z.string(), // TODO: use default and make it optional
+});
+
+export type Category = z.infer<typeof categorySchema>;

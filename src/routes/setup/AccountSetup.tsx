@@ -1,9 +1,11 @@
 import { APP_NAME } from "@/appConstants";
+import { CategoryOperations } from "@/model/categoryOps";
 import type { Wallet } from "@/model/schema";
 import { useCallback, useState } from "react";
 import { Form, useLoaderData, useNavigate } from "react-router-dom";
 import EditWalletModal from "./EditWalletModal";
 import WalletCard from "./WalletCard";
+import defaultCategories from "./default-categories";
 import type { LoaderData } from "./walletLoader";
 
 export default function AccountSetup() {
@@ -22,7 +24,8 @@ export default function AccountSetup() {
     setIsModalOpen(true);
   }, []);
 
-  function completeSetup() {
+  async function completeSetup() {
+    await CategoryOperations.bulkAdd(defaultCategories);
     localStorage.setItem(APP_NAME + "__initialSetupCompleted", "true");
     navigate("/");
   }
@@ -78,7 +81,7 @@ export default function AccountSetup() {
         )}
       </section>
 
-      <button onClick={completeSetup} className="btn btn-primary mt-auto w-full">
+      <button onClick={() => void completeSetup()} className="btn btn-primary mt-auto w-full">
         Complete
       </button>
     </main>

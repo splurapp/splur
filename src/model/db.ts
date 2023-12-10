@@ -1,6 +1,6 @@
 import type { Table } from "dexie";
 import Dexie from "dexie";
-import type { Wallet } from "./schema";
+import type { Category, Wallet } from "./schema";
 
 // ENUMS
 export enum ExchangeType {
@@ -51,13 +51,6 @@ export interface SplurTransaction {
   autoCategoryMap: boolean; // For marchant to Category or Sub Category Mapping
   recurringId?: number; // To identify recurring transaction
   loanId?: number; // To identify loan transaction
-}
-
-export interface Category {
-  id?: number;
-  name: string;
-  icon: string;
-  color: string;
 }
 
 // export interface Loan {
