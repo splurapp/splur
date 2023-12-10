@@ -1,128 +1,139 @@
 import { ExchangeType } from "@/model/db";
-import React, { useState } from "react";
-import { useLoaderData } from "react-router-dom";
+import { useState } from "react";
+import { useFetcher, useLoaderData } from "react-router-dom";
 import type { LoaderData } from "./track-loader";
 
-// TODO: setup categories
-export function Component() {
+export default function Track() {
+  const fetcher = useFetcher();
   const data = useLoaderData() as LoaderData;
-
-  const [date, setDate] = useState(data.transaction?.timestamp ?? new Date());
-  const [amount, setAmount] = useState(data.transaction?.amount ?? 0);
-  const [category, setCategory] = useState(data.transaction?.category?.name ?? "");
-  const [wallet, setWallet] = useState(data.transaction?.assignedToWallet?.name ?? "");
   const [exchangeType, setExchangeType] = useState<ExchangeType>(
     data?.transaction?.exchangeType ?? ExchangeType.DEBIT,
   );
 
-  function handleSubmit(e: React.SyntheticEvent) {
-    e.preventDefault();
-    console.log({
-      date,
-      amount,
-      category,
-      wallet,
-      exchangeType,
-    });
-  }
+  const timestamp = data.transaction?.timestamp ?? new Date();
 
   return (
     <main>
       <h1 className="mb-4 text-2xl font-bold">{!data.transaction ? "Add" : "Edit"} transaction</h1>
 
-      <div className="btm-nav btm-nav-sm relative mb-2">
-        {[ExchangeType.CREDIT, ExchangeType.DEBIT, ExchangeType.TRANSFER].map(type => (
-          <button
-            key={type}
-            className={`${
-              type === exchangeType ? "active bg-gradient-to-b from-base-300 to-base-200" : ""
-            }`}
-            onClick={() => setExchangeType(type)}
-          >
-            <span className="btm-nav-label">{type}</span>
-          </button>
-        ))}
-      </div>
+      <fetcher.Form method="post">
+        <div className="btm-nav btm-nav-sm relative mb-2">
+          {[ExchangeType.CREDIT, ExchangeType.DEBIT, ExchangeType.TRANSFER].map(type => (
+            <button
+              type="button"
+              key={type}
+              className={`${
+                type === exchangeType ? "active bg-gradient-to-b from-base-300 to-base-200" : ""
+              }`}
+              onClick={() => setExchangeType(type)}
+            >
+              <span className="btm-nav-label">{type}</span>
+            </button>
+          ))}
+          <input type="hidden" name="exchangeType" value={exchangeType} />
+        </div>
 
-      <form onSubmit={handleSubmit}>
-        <div className="form-control mb-4 w-full">
-          <label htmlFor="date" className="label">
-            Date
+        <div className="form-control mb-2 w-full">
+          <label htmlFor="title" className="label">
+            Title
           </label>
           <input
-            type="datetime-local"
-            id="date"
-            name="date"
-            className="input input-bordered w-full"
-            placeholder="Select Date"
-            value={date.toISOString().slice(0, 11) + date.toTimeString().slice(0, 5)}
-            onChange={e => setDate(new Date(e.target.value || new Date()))}
+            type="text"
+            id="title"
+            name="title"
+            minLength={2}
+            maxLength={50}
+            className="input input-bordered"
+            placeholder="Enter title"
+            defaultValue={data.transaction?.title ?? ""}
           />
         </div>
 
-        <div className="form-control mb-4 w-full">
+        <div className="form-control mb-2 w-full">
+          <label htmlFor="timestamp" className="label">
+            Date
+          </label>
+          <input
+            required
+            type="datetime-local"
+            id="timestamp"
+            name="timestamp"
+            className="input input-bordered w-full"
+            placeholder="Select Date"
+            defaultValue={`${timestamp.getFullYear()}-${
+              timestamp.getMonth() + 1
+            }-${timestamp.getDate()}T${timestamp.toTimeString().slice(0, 5)}`}
+          />
+        </div>
+
+        <div className="form-control mb-2 w-full">
           <label htmlFor="amount" className="label">
             Amount
           </label>
           <input
+            required
             type="number"
             id="amount"
             name="amount"
             min={0}
             className="input input-bordered"
             placeholder="Enter amount"
-            value={amount}
-            onChange={e => setAmount(Number(e.target.value))}
+            defaultValue={data.transaction?.amount ?? 0}
           />
         </div>
 
-        <div className="form-control mb-4 w-full">
-          <label htmlFor="category" className="label">
+        <div className="form-control mb-2 w-full">
+          <label htmlFor="categoryId" className="label">
             Category
           </label>
           <select
-            name="category"
-            id="category"
+            required
+            name="categoryId"
+            id="categoryId"
             className="select select-bordered"
-            value={category}
-            onChange={e => setCategory(e.target.value)}
+            defaultValue={data.transaction?.categoryId ?? ""}
           >
             <option value="" disabled>
               Select category
             </option>
-            <option value="Income">Food</option>
-            <option value="Expense">Travel</option>
+            {data.categories.map(category => (
+              <option key={category.id} value={category.id}>
+                {category.icon} {category.name}
+              </option>
+            ))}
           </select>
         </div>
 
-        <div className="form-control mb-4 w-full">
-          <label htmlFor="wallet" className="label">
+        <div className="form-control mb-2 w-full">
+          <label htmlFor="assignedTo" className="label">
             Wallet
           </label>
           <select
-            name="wallet"
-            id="wallet"
+            required
+            name="assignedTo"
+            id="assignedTo"
             className="select select-bordered"
-            value={wallet}
-            onChange={e => setWallet(e.target.value)}
+            defaultValue={data.transaction?.assignedTo ?? ""}
           >
             <option value="" disabled>
               Select wallet
             </option>
             {data.wallets.map(wallet => (
-              <option key={wallet.name} value={wallet.name}>
+              <option key={wallet.id} value={wallet.id}>
                 {wallet.name}
               </option>
             ))}
           </select>
         </div>
 
-        <button type="submit" className="btn btn-primary w-full">
+        <button
+          disabled={fetcher.state === "submitting"}
+          type="submit"
+          className="btn btn-primary w-full"
+        >
           Submit
         </button>
-      </form>
+      </fetcher.Form>
     </main>
   );
 }
-
-Component.displayName = "Track";

@@ -16,6 +16,8 @@ import { loader as transactionLoader } from "./home/transaction-loader";
 import AccountSetup from "./setup/AccountSetup";
 import Hello from "./setup/Hello";
 import { action as walletAction, loader as walletLoader } from "./setup/walletLoader";
+import Track from "./track";
+import { action as trackAction, loader as trackLoader } from "./track/track-loader";
 
 export const router = createBrowserRouter([
   {
@@ -54,11 +56,9 @@ export const router = createBrowserRouter([
           },
           {
             path: "track/:id?",
-            lazy: () => import("./track"),
-            async loader({ params, request }) {
-              const { loader } = await import("./track/track-loader");
-              return loader({ params, request });
-            },
+            element: <Track />,
+            loader: trackLoader,
+            action: trackAction,
           },
           {
             path: "accounts",
