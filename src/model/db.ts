@@ -25,6 +25,28 @@ export enum WalletType {
   CREDIT_CARD = "Credit Card",
 }
 
+export enum FrequencyType {
+  EVERY_DAY = "EVERY_DAY",
+  EVERY_MONTH = "EVERY_MONTH",
+  EVERY_YEAR = "EVERY_YEAR",
+}
+
+export enum CategoryType {
+  INCOME = "INCOME",
+  EXPENSE = "EXPENSE",
+}
+
+export enum FrequencyType {
+  EVERY_DAY = "EVERY_DAY",
+  EVERY_MONTH = "EVERY_MONTH",
+  EVERY_YEAR = "EVERY_YEAR",
+}
+
+export enum CategoryType {
+  INCOME = "INCOME",
+  EXPENSE = "EXPENSE",
+}
+
 export interface User {
   name: string;
   photo: Blob | null;
@@ -51,6 +73,13 @@ export interface SplurTransaction {
   autoCategoryMap?: boolean; // For marchant to Category or Sub Category Mapping
   recurringId?: number; // To identify recurring transaction
   loanId?: number; // To identify loan transaction
+}
+
+type refinedSplurTransaction = Omit<SplurTransaction, "recurringId">;
+export interface ScheduledTransaction extends refinedSplurTransaction {
+  frequency: FrequencyType;
+  jobHistory: Date[];
+  blacklist: Date[];
 }
 
 export interface CategoryMap {
@@ -85,6 +114,7 @@ export class MySubClassedDexie extends Dexie {
   user!: Table<User>;
   wallets!: Table<Wallet>;
   splurTransactions!: Table<SplurTransaction>;
+  scheduledTransactions!: Table<ScheduledTransaction>;
   categories!: Table<Category>;
   categoryMaps!: Table<CategoryMap>;
   importStatementConfigs!: Table<ImportStatementConfig>;
@@ -95,6 +125,7 @@ export class MySubClassedDexie extends Dexie {
       wallets: "++id, &name",
       user: "&name",
       splurTransactions: "++id, timestamp, assignedTo, transferFrom, loanId, categoryId",
+      scheduledTransactions: "++id, timestamp, assignedTo, transferFrom",
       categories: "++id, &name",
       categoryMaps: "++id",
       importStatementConfigs: "&name",
