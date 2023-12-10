@@ -48,28 +48,9 @@ export interface SplurTransaction {
   categoryId?: number;
   category?: Category; // Will not be used in DB (will only be used in get)
   // subcategory?: string;
-  autoCategoryMap: boolean; // For marchant to Category or Sub Category Mapping
+  autoCategoryMap?: boolean; // For marchant to Category or Sub Category Mapping
   recurringId?: number; // To identify recurring transaction
   loanId?: number; // To identify loan transaction
-}
-
-// export interface Loan {
-//   id?: number;
-//   timestamp: Date;
-//   amount: number;
-//   exchangeType: ExchangeType; // Borrow, Lend, Sub Borrow, Sub Lend
-//   recurring_id?: any; // To identify recurring transaction
-//   assignedTo?: number;
-//   transaction_exists: boolean | true;
-//   parent_id?: any; // To identify parent of current transaction
-// }
-
-export interface Preferences {
-  id?: number;
-  currency: Currency | Currency.INR;
-
-  // Application stuff
-  theme: string;
 }
 
 export interface CategoryMap {
@@ -105,8 +86,6 @@ export class MySubClassedDexie extends Dexie {
   wallets!: Table<Wallet>;
   splurTransactions!: Table<SplurTransaction>;
   categories!: Table<Category>;
-  // loans!: Table<Loan>;
-  preferences!: Table<Preferences>;
   categoryMaps!: Table<CategoryMap>;
   importStatementConfigs!: Table<ImportStatementConfig>;
 
@@ -117,8 +96,6 @@ export class MySubClassedDexie extends Dexie {
       user: "&name",
       splurTransactions: "++id, timestamp, assignedTo, transferFrom, loanId, categoryId",
       categories: "++id, &name",
-      // loans: "++id, timestamp, exchangeType, parent_id",
-      preferences: "id",
       categoryMaps: "++id",
       importStatementConfigs: "&name",
     });
