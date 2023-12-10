@@ -15,7 +15,7 @@ import Home from "./home";
 import { loader as transactionLoader } from "./home/transaction-loader";
 import AccountSetup from "./setup/AccountSetup";
 import Hello from "./setup/Hello";
-import { loader as walletLoader } from "./setup/walletLoader";
+import { action as walletAction, loader as walletLoader } from "./setup/walletLoader";
 
 export const router = createBrowserRouter([
   {
@@ -102,6 +102,7 @@ export const router = createBrowserRouter([
             path: "account",
             element: <AccountSetup />,
             loader: walletLoader,
+            action: walletAction,
           },
         ],
       },

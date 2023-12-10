@@ -1,6 +1,7 @@
-import type { Wallet } from "@/model/db";
 import { WalletType } from "@/model/db";
+import { walletSchema, type Wallet } from "@/model/schema";
 import { WalletOperations } from "@/model/walletOps";
+import type { ActionFunctionArgs } from "react-router-dom";
 
 const DEFAULT_WALLETS: Wallet[] = [
   {
@@ -36,4 +37,23 @@ export async function loader(): Promise<LoaderData> {
   }
 
   return { wallets, defaultWallets };
+}
+
+export async function action({ request }: ActionFunctionArgs) {
+  const formData = await request.formData();
+
+  switch (request.method) {
+    case "POST": {
+      const wallet = DEFAULT_WALLETS.find(wallet => wallet.name === formData.get("wallet"));
+      return await WalletOperations.create(wallet!);
+    }
+    case "PUT": {
+      const wallet = walletSchema.parse(Object.fromEntries(formData));
+      await WalletOperations.edit(wallet);
+      return wallet;
+    }
+    default: {
+      throw new Response("", { status: 405 });
+    }
+  }
 }
