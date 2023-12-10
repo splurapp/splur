@@ -11,17 +11,12 @@ import type { LoaderData } from "./walletLoader";
 export default function AccountSetup() {
   const navigate = useNavigate();
   const loaderData = useLoaderData() as LoaderData;
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [currentWallet, setCurrentWallet] = useState<Wallet | null>(null);
+  const [walletToEdit, setWalletToEdit] = useState<Wallet | null>(null);
 
-  const handleClose = useCallback(() => {
-    setCurrentWallet(null);
-    setIsModalOpen(false);
-  }, []);
+  const handleClose = useCallback(() => setWalletToEdit(null), []);
 
-  const handleEdit = useCallback<(editedWallet: Wallet) => void>(editedWallet => {
-    setCurrentWallet(editedWallet);
-    setIsModalOpen(true);
+  const handleEdit = useCallback<(wallet: Wallet) => void>(wallet => {
+    setWalletToEdit(wallet);
   }, []);
 
   async function completeSetup() {
@@ -44,9 +39,7 @@ export default function AccountSetup() {
           ))}
         </div>
 
-        {currentWallet && (
-          <EditWalletModal isOpen={isModalOpen} onClose={handleClose} wallet={currentWallet} />
-        )}
+        <EditWalletModal onClose={handleClose} wallet={walletToEdit} />
 
         {!!loaderData.defaultWallets.length && (
           <>
