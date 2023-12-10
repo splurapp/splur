@@ -49,7 +49,7 @@ export class TransactionOperations {
         .reverse()
         .sortBy("timestamp");
     } else {
-      transactions = await db.splurTransactions.toArray();
+      transactions = await db.splurTransactions.reverse().sortBy("timestamp");
     }
 
     return this.objsNormalizer(transactions.map(item => this.mapObj(wallets, categories, item)));
