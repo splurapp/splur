@@ -23,6 +23,12 @@ export enum WalletType {
   CREDITCARD = "CREDITCARD",
 }
 
+export enum FrequencyType {
+  EVERY_DAY = "EVERY_DAY",
+  EVERY_MONTH = "EVERY_MONTH",
+  EVERY_YEAR = "EVERY_YEAR",
+}
+
 export interface User {
   name: string;
   photo: Blob | null;
@@ -65,6 +71,30 @@ export interface Category {
   name: string;
   icon: string;
   color: string;
+}
+
+export interface ScheduledTransaction {
+  id?: number;
+  assignedTo?: number;
+  assignedToWallet?: Wallet;
+  timestamp: Date;
+  amount: number;
+  title?: string;
+  desc?: string;
+  exchanger?: string;
+  exchangeType: ExchangeType;
+  transferFrom?: number;
+  transferFromWallet?: Wallet;
+  transferTo?: number;
+  transferToWallet?: Wallet;
+  categoryId?: number;
+  category?: Category;
+  autoCategoryMap: boolean;
+  loanId?: number;
+  // Specific to scheduled transaction
+  frequency: FrequencyType;
+  jobHistory: Date[];
+  blacklist: Date[];
 }
 
 // export interface Loan {
@@ -118,6 +148,7 @@ export class MySubClassedDexie extends Dexie {
   user!: Table<User>;
   wallets!: Table<Wallet>;
   splurTransactions!: Table<SplurTransaction>;
+  scheduledTransactions!: Table<ScheduledTransaction>;
   categories!: Table<Category>;
   // loans!: Table<Loan>;
   preferences!: Table<Preferences>;
@@ -130,6 +161,7 @@ export class MySubClassedDexie extends Dexie {
       wallets: "++id, &name",
       user: "&name",
       splurTransactions: "++id, timestamp, assignedTo, transferFrom, loanId, categoryId",
+      scheduledTransactions: "++id, timestamp, assignedTo, transferFrom",
       categories: "++id, &name",
       // loans: "++id, timestamp, exchangeType, parent_id",
       preferences: "id",
