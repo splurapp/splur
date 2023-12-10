@@ -236,6 +236,7 @@ export class TransactionOperations {
         }
         return true;
       } catch (error) {
+        console.log(error);
         // return false;
         throw error;
       }
@@ -349,6 +350,7 @@ export class TransactionOperations {
         await db.splurTransactions.bulkDelete(transactionIdsWithoutLoan);
         return true;
       } catch (error) {
+        console.log(error);
         // return false;
         throw error;
       }
