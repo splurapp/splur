@@ -5,7 +5,7 @@ import { TransactionOperations } from "@/model/transactionOps";
 import { WalletOperations } from "@/model/walletOps";
 import { beforeEach, describe, expect, test } from "vitest";
 import type { Category, Wallet } from "../model/db";
-import { ExchangeType, MySubClassedDexie, WalletType } from "../model/db";
+import { CategoryType, ExchangeType, MySubClassedDexie, WalletType } from "../model/db";
 
 const db = new MySubClassedDexie("testDatabase");
 beforeEach(async () => {
@@ -46,6 +46,7 @@ describe("Category Operations", () => {
   test("Category add", async () => {
     const category: Category = {
       name: "Food",
+      type: CategoryType.EXPENSE,
       color: "#FFFFFF",
       icon: "🍕",
     };
@@ -57,12 +58,14 @@ describe("Category Operations", () => {
   test("Category bulkadd", async () => {
     const category: Category = {
       name: "Food",
+      type: CategoryType.EXPENSE,
       color: "#FFFFFF",
       icon: "🍕",
     };
 
     const category2: Category = {
       name: "Dinner",
+      type: CategoryType.EXPENSE,
       color: "#FFFFFF",
       icon: "🍕",
     };

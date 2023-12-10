@@ -29,6 +29,11 @@ export enum FrequencyType {
   EVERY_YEAR = "EVERY_YEAR",
 }
 
+export enum CategoryType {
+  INCOME = "INCOME",
+  EXPENSE = "EXPENSE",
+}
+
 export interface User {
   name: string;
   photo: Blob | null;
@@ -68,6 +73,7 @@ export interface SplurTransaction {
 
 export interface Category {
   id?: number;
+  type: CategoryType;
   name: string;
   icon: string;
   color: string;
