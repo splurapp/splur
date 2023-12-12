@@ -9,9 +9,7 @@
     "preview": "vite preview",
     "test": "vitest",
     "format": "prettier . --write",
-    "format:check": "prettier . --check",
-    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "prepare": "husky install"
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0"
   },
   "dependencies": {
     "dexie": "^3.2.4",
@@ -42,7 +40,6 @@
     "typescript": "^5.2.2",
     "vite": "^4.4.9",
     "vite-plugin-pwa": "^0.16.5",
-    "vitest": "^0.34.6",
-    "husky": "^8.0.0"
+    "vitest": "^0.34.6"
   }
 }
