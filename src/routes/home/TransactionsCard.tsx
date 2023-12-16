@@ -6,7 +6,7 @@ import { Link } from "react-router-dom";
 export default function TransactionsCard({ data }: { data: SplurTransaction }) {
   return (
     <Link to={`track/${data.id}`}>
-      <div className="card-compact card join-item card-bordered border border-primary shadow-lg">
+      <div className="card join-item card-bordered card-compact border border-primary shadow-lg">
         <div className="card-body flex-row gap-3">
           <div className="rounded-lg bg-primary p-5">
             <svg
@@ -24,9 +24,9 @@ export default function TransactionsCard({ data }: { data: SplurTransaction }) {
             <p>{data.desc ?? "No description"}</p>
           </div>
 
-          <div className="ml-auto text-end">
+          <div className="ml-auto">
             <h1
-              className={`card-title ml-auto ${
+              className={`card-title justify-end ${
                 data.exchangeType === ExchangeType.enum.Income ? "text-success" : "text-error"
               }`}
             >

@@ -3,7 +3,7 @@ import { ExchangeType } from "@/model/schema";
 import { useMemo, useState } from "react";
 import { useFetcher, useLoaderData } from "react-router-dom";
 import type { z } from "zod";
-import type { LoaderData } from "./track-loader";
+import type { LoaderData } from "./track.service";
 
 export default function Track() {
   const fetcher = useFetcher<{ error?: string }>();

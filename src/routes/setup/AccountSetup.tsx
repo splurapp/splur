@@ -5,8 +5,8 @@ import { useCallback, useState } from "react";
 import { Form, useLoaderData, useNavigate } from "react-router-dom";
 import EditWalletModal from "./EditWalletModal";
 import WalletCard from "./WalletCard";
+import type { LoaderData } from "./account-setup.service";
 import defaultCategories from "./default-categories";
-import type { LoaderData } from "./walletLoader";
 
 export default function AccountSetup() {
   const navigate = useNavigate();

@@ -12,12 +12,12 @@ import Accounts from "./accounts";
 import NewAccount from "./accounts/new";
 import Dev from "./dev/Dev";
 import Home from "./home";
-import { loader as transactionLoader } from "./home/transaction-loader";
+import { loader as transactionLoader } from "./home/home.service";
 import AccountSetup from "./setup/AccountSetup";
 import Hello from "./setup/Hello";
-import { action as walletAction, loader as walletLoader } from "./setup/walletLoader";
+import { action as walletAction, loader as walletLoader } from "./setup/account-setup.service";
 import Track from "./track";
-import { action as trackAction, loader as trackLoader } from "./track/track-loader";
+import { action as trackAction, loader as trackLoader } from "./track/track.service";
 
 export const router = createBrowserRouter([
   {

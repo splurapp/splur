@@ -54,6 +54,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
       }
 
       if (id) {
+        payload.id = id;
         await TransactionOperations.edit(payload);
       } else {
         await TransactionOperations.add(payload);
