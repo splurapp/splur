@@ -16,8 +16,8 @@ export class TransactionOperations {
     categories: Category[],
     transaction: T,
   ): T {
-    if (transaction.assignedTo) {
-      transaction.assignedToWallet = WalletOperations.getObj(wallets, transaction?.assignedTo);
+    if (transaction.walletId) {
+      transaction.assignedToWallet = WalletOperations.getObj(wallets, transaction?.walletId);
     }
 
     if (transaction.transferFrom) {
@@ -42,7 +42,7 @@ export class TransactionOperations {
 
     if (walletId) {
       transactions = await db.splurTransactions
-        .where("assignedTo")
+        .where("walletId")
         .equals(walletId)
         .or("transferFrom")
         .equals(walletId)
@@ -90,7 +90,7 @@ export class TransactionOperations {
       transactions = await db.splurTransactions
         .where("timestamp")
         .between(startOfYear, endOfYear, true, true)
-        .and(record => record.assignedTo === walletId)
+        .and(record => record.walletId === walletId)
         .reverse()
         .sortBy("timestamp");
     } else {
@@ -115,7 +115,7 @@ export class TransactionOperations {
       transactions = await db.splurTransactions
         .where("timestamp")
         .between(startOfMonth, endOfMonth, true, true)
-        .and(record => record.assignedTo === walletId)
+        .and(record => record.walletId === walletId)
         .reverse()
         .sortBy("timestamp");
     } else {
@@ -138,7 +138,7 @@ export class TransactionOperations {
       transactions = await db.splurTransactions
         .where("timestamp")
         .equals(date)
-        .and(record => record.assignedTo === walletId)
+        .and(record => record.walletId === walletId)
         .reverse()
         .sortBy("timestamp");
     } else {
@@ -161,7 +161,7 @@ export class TransactionOperations {
       transactions = await db.splurTransactions
         .where("timestamp")
         .between(startDate, endDate, true, true)
-        .and(record => record.assignedTo === walletId)
+        .and(record => record.walletId === walletId)
         .reverse()
         .sortBy("timestamp");
     } else {
@@ -304,7 +304,7 @@ export class TransactionOperations {
         if (!transaction) throw new Error("Transaction doesn't exists");
 
         if (LoanOperations.isLoan(transaction)) {
-          await db.splurTransactions.update(id, { assignedTo: undefined });
+          await db.splurTransactions.update(id, { walletId: undefined });
         } else {
           await db.splurTransactions.delete(id);
         }
@@ -335,7 +335,7 @@ export class TransactionOperations {
         for (const transaction of transactions) {
           if (transaction?.id) {
             if (LoanOperations.isLoan(transaction)) {
-              transaction.assignedTo = undefined;
+              transaction.walletId = undefined;
               transactionIdsWithLoan.push(transaction);
             } else {
               transactionIdsWithoutLoan.push(transaction.id);
@@ -398,7 +398,7 @@ export class LoanOperations {
         if (!objIndex) throw new Error("Transaction creation failed");
 
         // Sync wallet
-        if (transaction.assignedTo) {
+        if (transaction.walletId) {
           await WalletOperations.sync(transaction);
         }
 
@@ -439,9 +439,9 @@ export class LoanOperations {
           );
         }
 
-        if (transaction.assignedTo) {
+        if (transaction.walletId) {
           // Validate if assigned to Really exists in DB
-          const wallet = await WalletOperations.getById(transaction.assignedTo);
+          const wallet = await WalletOperations.getById(transaction.walletId);
 
           if (!wallet) throw new Error("Assigned wallet id doesn't exists");
         }
@@ -450,7 +450,7 @@ export class LoanOperations {
         const transactionId = await db.splurTransactions.add(transaction);
         if (!transactionId) throw new Error("Transaction creation failed");
 
-        if (transaction.assignedTo) {
+        if (transaction.walletId) {
           await WalletOperations.sync(transaction);
         }
 
@@ -479,18 +479,18 @@ export class LoanOperations {
         const prevTransaction = await TransactionOperations.getById(transaction.id);
 
         const ret = await db.splurTransactions.update(transaction.id, {
-          assignedTo: transaction.assignedTo,
+          walletId: transaction.walletId,
           amount: transaction.amount,
         });
 
         // Syncing wallet
         if (ret === 1 && prevTransaction) {
-          if (prevTransaction.assignedTo) {
+          if (prevTransaction.walletId) {
             // Popped previous transaction
             await WalletOperations.sync(prevTransaction, true);
           }
 
-          if (transaction.assignedTo) {
+          if (transaction.walletId) {
             // Synced new modified transaction
             await WalletOperations.sync(transaction);
           }
@@ -519,7 +519,7 @@ export class LoanOperations {
 
         // Reverting wallet changes whatever parent or child is associated with wallet
         for (const transaction of loanTransactions) {
-          if (transaction?.assignedTo) {
+          if (transaction?.walletId) {
             await WalletOperations.sync(transaction, true);
           }
         }
@@ -557,7 +557,7 @@ export class LoanOperations {
         }
 
         // Revert wallet changes
-        if (childTransaction.assignedTo) {
+        if (childTransaction.walletId) {
           await WalletOperations.sync(childTransaction, true);
         }
 
@@ -584,11 +584,11 @@ export class LoanOperations {
         }
 
         // Revert wallet changes
-        if (transaction.assignedTo) {
+        if (transaction.walletId) {
           await WalletOperations.sync(transaction, true);
         }
 
-        await db.splurTransactions.update(transactionId, { assignedTo: undefined });
+        await db.splurTransactions.update(transactionId, { walletId: undefined });
 
         return transactionId;
       } catch (error) {

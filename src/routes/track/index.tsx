@@ -108,15 +108,15 @@ export default function Track() {
         </div>
 
         <div className="form-control mb-2 w-full">
-          <label htmlFor="assignedTo" className="label">
+          <label htmlFor="walletId" className="label">
             Wallet
           </label>
           <select
             required
-            name="assignedTo"
-            id="assignedTo"
+            name="walletId"
+            id="walletId"
             className="select select-bordered"
-            defaultValue={data.transaction?.assignedTo ?? ""}
+            defaultValue={data.transaction?.walletId ?? ""}
           >
             <option value="" disabled>
               Select wallet

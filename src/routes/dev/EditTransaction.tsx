@@ -79,7 +79,7 @@ export default function EditTransaction({
       };
 
       if (transaction.exchangeType === ExchangeType.enum.Transfer) {
-        myNewTransaction.assignedTo = transaction.transferFrom;
+        myNewTransaction.walletId = transaction.transferFrom;
       }
 
       console.log(myNewTransaction);
@@ -92,7 +92,7 @@ export default function EditTransaction({
         exchangeType: exchangeType,
         transferFrom: wallet.id,
         transferTo: transferTo,
-        assignedTo: transferTo,
+        walletId: transferTo,
       };
       await TransactionOperations.edit(myNewTransaction);
     }

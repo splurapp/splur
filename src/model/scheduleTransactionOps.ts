@@ -16,7 +16,7 @@ export class ScheduledTransactionOperations {
 
     if (walletId) {
       transactions = await db.scheduledTransactions
-        .where("assignedTo")
+        .where("walletId")
         .equals(walletId)
         .or("transferFrom")
         .equals(walletId)
@@ -160,7 +160,7 @@ export class ScheduledTransactionOperations {
 
           // Create splur transaction
           const newSplurTransaction: SplurTransaction = {
-            assignedTo: curr.assignedTo,
+            walletId: curr.walletId,
             timestamp: new Date(),
             amount: curr.amount,
             title: curr.title,

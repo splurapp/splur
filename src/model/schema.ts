@@ -37,7 +37,7 @@ export const ExchangeType = z.enum([
 
 export const transactionSchema = z.object({
   id: z.coerce.number().optional(),
-  assignedTo: z.coerce.number().optional(), // TODO: rename to walletId
+  walletId: z.coerce.number().optional(),
   timestamp: z.coerce.date(),
   amount: z.coerce.number().gte(0),
   title: z.string().optional(),

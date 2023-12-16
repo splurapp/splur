@@ -29,7 +29,7 @@ export class WalletOperations {
           // New Transaction need to be created
           const newTransaction: SplurTransaction = {
             timestamp: new Date(),
-            assignedTo: walletId,
+            walletId: walletId,
             amount: wallet.amount,
             autoCategoryMap: false,
             title: "Adjust balance",
@@ -65,7 +65,7 @@ export class WalletOperations {
           return await db.transaction("rw", db.splurTransactions, async () => {
             try {
               const uselessTransactions = await db.splurTransactions
-                .where("assignedTo")
+                .where("walletId")
                 .equals(id)
                 .and(
                   record =>
@@ -107,7 +107,7 @@ export class WalletOperations {
           // New Transaction need to be created for adjustments based on negative or positive amount
           const newTransaction: SplurTransaction = {
             timestamp: new Date(),
-            assignedTo: currWallet.id,
+            walletId: currWallet.id,
             amount:
               wallet.amount > currWallet.amount
                 ? wallet.amount - currWallet.amount
@@ -138,7 +138,7 @@ export class WalletOperations {
     return await db.transaction("rw", db.wallets, db.splurTransactions, async () => {
       try {
         if (transaction.exchangeType !== "Transfer") {
-          const currWallet = await WalletOperations.getById(transaction.assignedTo);
+          const currWallet = await WalletOperations.getById(transaction.walletId);
 
           if (currWallet) {
             if (
@@ -168,7 +168,7 @@ export class WalletOperations {
         } else {
           const transferFrom = await WalletOperations.getById(transaction.transferFrom);
           const transferTo = await WalletOperations.getById(transaction.transferTo);
-          const currWallet = await WalletOperations.getById(transaction.assignedTo);
+          const currWallet = await WalletOperations.getById(transaction.walletId);
 
           // Transfer revert
           if (revert) {

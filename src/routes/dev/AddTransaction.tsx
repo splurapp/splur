@@ -72,7 +72,7 @@ export default function AddTransaction({ wallet, refreshTransactions }: Props) {
 
     const newTransaction: SplurTransaction = {
       timestamp: new Date(),
-      assignedTo: wallet.id,
+      walletId: wallet.id,
       amount: amount,
       autoCategoryMap: true,
       // dismissed: undefined,
@@ -93,7 +93,7 @@ export default function AddTransaction({ wallet, refreshTransactions }: Props) {
         ...newTransaction,
         transferFrom: wallet.id,
         transferTo: transferTo,
-        assignedTo: transferTo,
+        walletId: transferTo,
       };
       await TransactionOperations.add(myNewTransaction);
     }
