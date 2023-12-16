@@ -46,7 +46,7 @@ describe("Category Operations", () => {
   test("Category add", async () => {
     const category: Category = {
       name: "Food",
-      type: CategoryType.enum.Expense,
+      types: [CategoryType.enum.Expense],
       color: "#FFFFFF",
       icon: "🍕",
     };
@@ -58,14 +58,14 @@ describe("Category Operations", () => {
   test("Category bulkadd", async () => {
     const category: Category = {
       name: "Food",
-      type: CategoryType.enum.Expense,
+      types: [CategoryType.enum.Expense],
       color: "#FFFFFF",
       icon: "🍕",
     };
 
     const category2: Category = {
       name: "Dinner",
-      type: CategoryType.enum.Expense,
+      types: [CategoryType.enum.Expense],
       color: "#FFFFFF",
       icon: "🍕",
     };
