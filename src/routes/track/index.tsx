@@ -22,7 +22,7 @@ export default function Track() {
   return (
     <main>
       <h1 className="mb-4 text-2xl font-bold">{!data.transaction ? "Add" : "Edit"} transaction</h1>
-      <div className="btm-nav btm-nav-sm relative mb-2">
+      <div role="tablist" className="tabs tabs-boxed w-full bg-base-200">
         {[ExchangeType.enum.Income, ExchangeType.enum.Expense, ExchangeType.enum.Transfer].map(
           type => (
             <button
@@ -32,12 +32,11 @@ export default function Track() {
               }
               type="button"
               key={type}
-              className={`${
-                type === exchangeType ? "active bg-gradient-to-b from-base-300 to-base-200" : ""
-              }`}
+              role="tab"
+              className={`tab flex-1 ${type === exchangeType ? "tab-active" : ""}`}
               onClick={() => setExchangeType(type)}
             >
-              <span className="btm-nav-label">{type}</span>
+              {type}
             </button>
           ),
         )}
