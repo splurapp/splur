@@ -1,4 +1,3 @@
-import type { IndexableType } from "dexie";
 import { CategoryOperations } from "./categoryOps";
 import db from "./db";
 import {
@@ -57,14 +56,13 @@ export class TransactionOperations {
     );
   }
 
-  static async getById(transactionId?: number): Promise<SplurTransaction | undefined> {
+  static async getById(transactionId: number): Promise<SplurTransactionWithData> {
     const wallets = await WalletOperations.get();
     const categories = await CategoryOperations.get();
-    const transaction = await db.splurTransactions.get(transactionId as IndexableType);
+    const transaction = await db.splurTransactions.get(transactionId);
 
-    // Map category as well
-    // WIP
-    return transaction ? this.mapObj(wallets, categories, transaction) : transaction;
+    if (!transaction) throw new Error(`No such transaction with id = ${transactionId}`);
+    return this.mapObj<SplurTransactionWithData>(wallets, categories, transaction);
   }
 
   // WIP

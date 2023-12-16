@@ -20,7 +20,7 @@ export const categorySchema = z.object({
   name: z.string().min(2).max(50),
   icon: z.string().emoji(),
   color: z.string(),
-  type: CategoryType.default("Expense"),
+  types: CategoryType.array(),
 });
 
 export type Category = z.infer<typeof categorySchema>;

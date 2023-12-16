@@ -70,7 +70,7 @@ export class MySubClassedDexie extends Dexie {
       user: "&name",
       splurTransactions: "++id, timestamp, walletId, transferFrom, loanId, categoryId",
       scheduledTransactions: "++id, timestamp, walletId, transferFrom",
-      categories: "++id, &name",
+      categories: "++id, &name, *types",
       categoryMaps: "++id",
       importStatementConfigs: "&name",
     });
