@@ -6,7 +6,7 @@ import { Link } from "react-router-dom";
 export default function TransactionsCard({ data }: { data: SplurTransaction }) {
   return (
     <Link to={`track/${data.id}`}>
-      <div className="card-compact card join-item card-bordered border border-primary shadow-lg">
+      <div className="card join-item card-bordered card-compact border border-primary shadow-lg">
         <div className="card-body flex-row gap-3">
           <div className="rounded-lg bg-primary p-5">
             <svg

@@ -61,6 +61,9 @@ devDependencies:
   fake-indexeddb:
     specifier: ^5.0.1
     version: 5.0.1
+  husky:
+    specifier: ^8.0.0
+    version: 8.0.3
   postcss:
     specifier: ^8.4.31
     version: 8.4.31
@@ -3725,6 +3728,12 @@ packages:
       debug: 4.3.4
     transitivePeerDependencies:
       - supports-color
+    dev: true
+
+  /husky@8.0.3:
+    resolution: {integrity: sha512-+dQSyqPh4x1hlO1swXBiNb2HzTDN1I2IGLQx1GrBuiqFJfoMrnZWwVmatvSiO+Iz8fBUnf+lekwNo4c2LlXItg==}
+    engines: {node: '>=14'}
+    hasBin: true
     dev: true
 
   /iconv-lite@0.4.24:
