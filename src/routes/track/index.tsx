@@ -22,7 +22,7 @@ export default function Track() {
   return (
     <main>
       <h1 className="mb-4 text-2xl font-bold">{!data.transaction ? "Add" : "Edit"} transaction</h1>
-      <div role="tablist" className="tabs tabs-boxed w-full bg-base-200">
+      <div role="tablist" className="tabs-boxed tabs w-full bg-base-200">
         {[ExchangeType.enum.Income, ExchangeType.enum.Expense, ExchangeType.enum.Transfer].map(
           type => (
             <button
@@ -186,6 +186,10 @@ export default function Track() {
           </>
         )}
 
+        {fetcher.data && "error" in fetcher.data && (
+          <p className="my-2 text-sm text-error">{fetcher.data.error}</p>
+        )}
+
         <button
           disabled={fetcher.state === "submitting"}
           type="submit"
@@ -193,11 +197,26 @@ export default function Track() {
         >
           Submit
         </button>
-
-        {fetcher.data && "error" in fetcher.data && (
-          <p className="my-2 text-sm text-error">{fetcher.data.error}</p>
-        )}
       </fetcher.Form>
+
+      {data.transaction ? (
+        <fetcher.Form
+          method="delete"
+          onSubmit={e => {
+            if (!confirm("Please confirm you want to delete this transaction.")) {
+              e.preventDefault();
+            }
+          }}
+        >
+          <button
+            disabled={fetcher.state === "submitting"}
+            type="submit"
+            className="btn mt-1 w-full bg-base-200"
+          >
+            Delete
+          </button>
+        </fetcher.Form>
+      ) : null}
     </main>
   );
 }

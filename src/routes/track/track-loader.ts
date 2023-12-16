@@ -34,20 +34,31 @@ export async function loader({ params }: LoaderFunctionArgs<unknown>): Promise<L
 
 export async function action({ request, params }: ActionFunctionArgs) {
   const id = Number(params?.id) || 0;
-  const formData = Object.fromEntries(await request.formData());
-  const payload = transactionSchema.parse(formData);
 
-  if (payload.exchangeType === "Transfer") {
-    if (payload.transferFrom === payload.transferTo) {
-      return json({ error: "Transfer from and To wallet can not be the same" });
+  switch (request.method) {
+    case "DELETE": {
+      if (id) {
+        await TransactionOperations.delete(id); // TODO: error handle
+      }
+      break;
     }
-    payload.walletId = payload.transferTo; // TODO: probably not the best way to handle this
-  }
+    default: {
+      const formData = Object.fromEntries(await request.formData());
+      const payload = transactionSchema.parse(formData);
 
-  if (id) {
-    await TransactionOperations.edit(payload);
-  } else {
-    await TransactionOperations.add(payload);
+      if (payload.exchangeType === "Transfer") {
+        if (payload.transferFrom === payload.transferTo) {
+          return json({ error: "Transfer from and To wallet can not be the same" });
+        }
+        payload.walletId = payload.transferTo; // TODO: probably not the best way to handle this
+      }
+
+      if (id) {
+        await TransactionOperations.edit(payload);
+      } else {
+        await TransactionOperations.add(payload);
+      }
+    }
   }
 
   return redirect("/");
