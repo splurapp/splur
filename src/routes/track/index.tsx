@@ -1,13 +1,14 @@
-import { ExchangeType } from "@/model/db";
+import { ExchangeType } from "@/model/schema";
 import { useState } from "react";
 import { useFetcher, useLoaderData } from "react-router-dom";
+import type { z } from "zod";
 import type { LoaderData } from "./track-loader";
 
 export default function Track() {
   const fetcher = useFetcher();
   const data = useLoaderData() as LoaderData;
-  const [exchangeType, setExchangeType] = useState<ExchangeType>(
-    data?.transaction?.exchangeType ?? ExchangeType.DEBIT,
+  const [exchangeType, setExchangeType] = useState<z.infer<typeof ExchangeType>>(
+    data?.transaction?.exchangeType ?? ExchangeType.enum.Expense,
   );
 
   const timestamp = data.transaction?.timestamp ?? new Date();
@@ -18,18 +19,20 @@ export default function Track() {
 
       <fetcher.Form method="post">
         <div className="btm-nav btm-nav-sm relative mb-2">
-          {[ExchangeType.CREDIT, ExchangeType.DEBIT, ExchangeType.TRANSFER].map(type => (
-            <button
-              type="button"
-              key={type}
-              className={`${
-                type === exchangeType ? "active bg-gradient-to-b from-base-300 to-base-200" : ""
-              }`}
-              onClick={() => setExchangeType(type)}
-            >
-              <span className="btm-nav-label">{type}</span>
-            </button>
-          ))}
+          {[ExchangeType.enum.Income, ExchangeType.enum.Expense, ExchangeType.enum.Transfer].map(
+            type => (
+              <button
+                type="button"
+                key={type}
+                className={`${
+                  type === exchangeType ? "active bg-gradient-to-b from-base-300 to-base-200" : ""
+                }`}
+                onClick={() => setExchangeType(type)}
+              >
+                <span className="btm-nav-label">{type}</span>
+              </button>
+            ),
+          )}
           <input type="hidden" name="exchangeType" value={exchangeType} />
         </div>
 

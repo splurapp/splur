@@ -1,7 +1,6 @@
 import type { IndexableType, IndexableTypeArray } from "dexie";
-import type { SplurTransaction } from "./db";
-import db, { ExchangeType } from "./db";
-import type { Wallet } from "./schema";
+import db from "./db";
+import { type SplurTransaction, type Wallet } from "./schema";
 import { TransactionOperations } from "./transactionOps";
 
 export class WalletOperations {
@@ -34,9 +33,8 @@ export class WalletOperations {
             amount: wallet.amount,
             autoCategoryMap: false,
             title: "Adjust balance",
-            // dismissed: undefined,
             exchanger: undefined,
-            exchangeType: ExchangeType.CREDIT,
+            exchangeType: "Income",
             transferFrom: undefined,
             transferTo: undefined,
           };
@@ -48,7 +46,6 @@ export class WalletOperations {
         return await WalletOperations.getById(walletId);
       } catch (error) {
         console.log(error);
-        // return null;
         throw error;
       }
     });
@@ -72,8 +69,8 @@ export class WalletOperations {
                 .equals(id)
                 .and(
                   record =>
-                    record.exchangeType !== ExchangeType.TRANSFER ||
-                    (record.exchangeType === ExchangeType.TRANSFER &&
+                    record.exchangeType !== "Transfer" ||
+                    (record.exchangeType === "Transfer" &&
                       !walletIds.includes(record.transferFrom)),
                 )
                 .toArray();
@@ -83,7 +80,6 @@ export class WalletOperations {
               return id;
             } catch (error) {
               console.log(error);
-              // return null;
               throw error;
             }
           });
@@ -92,7 +88,6 @@ export class WalletOperations {
         return id;
       } catch (error) {
         console.log(error);
-        // return null;
         throw error;
       }
     });
@@ -119,10 +114,8 @@ export class WalletOperations {
                 : currWallet.amount - wallet.amount,
             autoCategoryMap: false,
             title: "Adjust balance",
-            // dismissed: undefined,
             exchanger: undefined,
-            exchangeType:
-              wallet.amount > currWallet.amount ? ExchangeType.CREDIT : ExchangeType.DEBIT,
+            exchangeType: wallet.amount > currWallet.amount ? "Income" : "Expense",
             transferFrom: undefined,
             transferTo: undefined,
           };
@@ -136,7 +129,6 @@ export class WalletOperations {
         return ret === 1 && updatedWallet ? updatedWallet : null;
       } catch (error) {
         console.log(error);
-        // return null;
         throw error;
       }
     });
@@ -145,22 +137,22 @@ export class WalletOperations {
   static async sync(transaction: SplurTransaction, revert = false): Promise<boolean> {
     return await db.transaction("rw", db.wallets, db.splurTransactions, async () => {
       try {
-        if (transaction.exchangeType !== ExchangeType.TRANSFER) {
+        if (transaction.exchangeType !== "Transfer") {
           const currWallet = await WalletOperations.getById(transaction.assignedTo);
 
           if (currWallet) {
             if (
-              transaction.exchangeType === ExchangeType.BORROW ||
-              transaction.exchangeType === ExchangeType.SUB_LEND ||
-              transaction.exchangeType === ExchangeType.CREDIT
+              transaction.exchangeType === "Borrow" ||
+              transaction.exchangeType === "SubLend" ||
+              transaction.exchangeType === "Income"
             ) {
               currWallet.amount = revert
                 ? currWallet.amount - transaction.amount
                 : currWallet.amount + transaction.amount;
             } else if (
-              transaction.exchangeType === ExchangeType.LEND ||
-              transaction.exchangeType === ExchangeType.SUB_BORROW ||
-              transaction.exchangeType === ExchangeType.DEBIT
+              transaction.exchangeType === "Lend" ||
+              transaction.exchangeType === "SubBorrow" ||
+              transaction.exchangeType === "Expense"
             ) {
               currWallet.amount = revert
                 ? currWallet.amount + transaction.amount
@@ -183,7 +175,6 @@ export class WalletOperations {
             // Add amounts to the transfer to if its exists
             if (transferFrom) {
               transferFrom.amount = transferFrom.amount + transaction.amount;
-              // await WalletOperations.edit(transferFrom);
               await db.wallets.update(transferFrom.id as IndexableType, {
                 amount: transferFrom.amount,
               });
@@ -192,7 +183,6 @@ export class WalletOperations {
             // Balancing current wallet too
             if (transferTo && currWallet && currWallet.id === transferTo.id) {
               currWallet.amount = currWallet.amount - transaction.amount;
-              // await WalletOperations.edit(currWallet);
               await db.wallets.update(currWallet.id as IndexableType, {
                 amount: currWallet.amount,
               });
@@ -209,8 +199,6 @@ export class WalletOperations {
 
           currWallet.amount += transaction.amount;
           transferFrom.amount -= transaction.amount;
-          // await WalletOperations.edit(currWallet);
-          // await WalletOperations.edit(transferFrom);
           await db.wallets.update(currWallet.id as IndexableType, {
             amount: currWallet.amount,
           });
@@ -221,7 +209,6 @@ export class WalletOperations {
         }
       } catch (error) {
         console.log(error);
-        // return false;
         throw error;
       }
     });
@@ -233,7 +220,6 @@ export class WalletOperations {
       return true;
     } catch (error) {
       console.log(error);
-      // return false;
       throw error;
     }
   }

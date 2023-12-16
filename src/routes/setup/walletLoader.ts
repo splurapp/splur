@@ -1,22 +1,21 @@
-import { WalletType } from "@/model/db";
-import { walletSchema, type Wallet } from "@/model/schema";
+import { WalletType, walletSchema, type Wallet } from "@/model/schema";
 import { WalletOperations } from "@/model/walletOps";
 import type { ActionFunctionArgs } from "react-router-dom";
 
 const DEFAULT_WALLETS: Wallet[] = [
   {
     name: "Bank",
-    type: WalletType.BANK,
+    type: WalletType.enum.Bank,
     amount: 0,
   },
   {
     name: "Credit Card",
-    type: WalletType.CREDIT_CARD,
+    type: WalletType.enum.CreditCard,
     amount: 0,
   },
   {
     name: "Cash",
-    type: WalletType.CASH,
+    type: WalletType.enum.Cash,
     amount: 0,
   },
 ];

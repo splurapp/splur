@@ -1,6 +1,6 @@
 import { formatCurrency } from "@/lib/currency";
 import { dateFormatter } from "@/lib/date";
-import { ExchangeType, type SplurTransaction } from "@/model/db";
+import { ExchangeType, type SplurTransaction } from "@/model/schema";
 import { Link } from "react-router-dom";
 
 export default function TransactionsCard({ data }: { data: SplurTransaction }) {
@@ -27,7 +27,7 @@ export default function TransactionsCard({ data }: { data: SplurTransaction }) {
           <div className="ml-auto text-end">
             <h1
               className={`card-title ml-auto ${
-                data.exchangeType === ExchangeType.CREDIT ? "text-success" : "text-error"
+                data.exchangeType === ExchangeType.enum.Income ? "text-success" : "text-error"
               }`}
             >
               {formatCurrency(data.amount)}

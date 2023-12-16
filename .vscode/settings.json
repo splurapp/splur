@@ -4,5 +4,5 @@
     "source.organizeImports": "always"
   },
   "editor.defaultFormatter": "esbenp.prettier-vscode",
-  "cSpell.words": ["Splur"]
+  "cSpell.words": ["dexie", "Splur"]
 }

@@ -1,19 +1,22 @@
-import type { SplurTransaction } from "@/model/db";
-import { ExchangeType } from "@/model/db";
+import type { SplurTransaction } from "@/model/schema";
+import { ExchangeType } from "@/model/schema";
 import { LoanOperations } from "@/model/transactionOps";
 import { useState } from "react";
+import type { z } from "zod";
 import ChildLoans from "./ChildLoans";
 import EditParentLoan from "./EditParentLoan";
 
 const getExchangeType = (i: string) => {
-  if (ExchangeType.BORROW.toString() === i) return ExchangeType.BORROW;
-  return ExchangeType.LEND;
+  if (i === ExchangeType.enum.Borrow) return ExchangeType.enum.Borrow;
+  return ExchangeType.enum.Lend;
 };
 
 export default function Loan() {
   const [loans, setLoans] = useState<SplurTransaction[]>([]);
   const [childLoans, setChildLoans] = useState<SplurTransaction[]>([]);
-  const [exchangeType, setExchangeType] = useState<ExchangeType>(() => ExchangeType.BORROW);
+  const [exchangeType, setExchangeType] = useState<z.infer<typeof ExchangeType>>(
+    () => ExchangeType.enum.Borrow,
+  );
   const [amount, setAmount] = useState(() => 0);
 
   const refreshLoans = async () => {
@@ -86,7 +89,7 @@ export default function Loan() {
             </div>
             <div>
               Type ::{" "}
-              <strong>{item.exchangeType === ExchangeType.BORROW ? "Borrow" : "Lend"}</strong>
+              <strong>{item.exchangeType === ExchangeType.enum.Borrow ? "Borrow" : "Lend"}</strong>
             </div>
             <div>
               Completion :: <strong>{getCompletion(item)}</strong>
@@ -108,10 +111,10 @@ export default function Loan() {
             value={exchangeType}
             onChange={e => setExchangeType(getExchangeType(e.target.value))}
           >
-            <option key={1} value={ExchangeType.BORROW}>
+            <option key={1} value={ExchangeType.enum.Borrow}>
               Borrow
             </option>
-            <option key={4} value={ExchangeType.LEND}>
+            <option key={4} value={ExchangeType.enum.Lend}>
               Lend
             </option>
           </select>

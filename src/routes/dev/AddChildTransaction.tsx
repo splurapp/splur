@@ -1,7 +1,8 @@
-import type { SplurTransaction } from "@/model/db";
-import { ExchangeType } from "@/model/db";
+import type { SplurTransaction } from "@/model/schema";
+import { ExchangeType } from "@/model/schema";
 import { LoanOperations } from "@/model/transactionOps";
 import { useState } from "react";
+import type { z } from "zod";
 
 interface Props {
   parent: SplurTransaction;
@@ -11,8 +12,8 @@ interface Props {
 export default function AddChildTransaction({ parent, refreshTransactions }: Props) {
   const [show, setShow] = useState(false);
   const [amount, setAmount] = useState(0);
-  const [exchangeType] = useState<ExchangeType>(() =>
-    parent.exchangeType === ExchangeType.BORROW ? ExchangeType.SUB_BORROW : ExchangeType.SUB_LEND,
+  const [exchangeType] = useState<z.infer<typeof ExchangeType>>(() =>
+    parent.exchangeType === "Borrow" ? "SubBorrow" : "SubLend",
   );
 
   const addTransaction = async () => {
@@ -45,7 +46,7 @@ export default function AddChildTransaction({ parent, refreshTransactions }: Pro
         <div>
           <div>
             <label>
-              Transaction Type: {exchangeType === ExchangeType.SUB_BORROW ? "Borrow" : "Lend"}
+              Transaction Type: {exchangeType === ExchangeType.enum.SubBorrow ? "Borrow" : "Lend"}
             </label>
 
             <br></br>

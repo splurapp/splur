@@ -1,50 +1,18 @@
 import type { Table } from "dexie";
 import Dexie from "dexie";
-import type { Category, Wallet } from "./schema";
+import type { Category, SplurTransaction, Wallet } from "./schema";
 
 // ENUMS
-export enum ExchangeType {
-  CREDIT = "Income",
-  DEBIT = "Expense",
-  TRANSFER = "Transfer",
-  LEND = "LND",
-  SUB_LEND = "SLND",
-  BORROW = "BRW",
-  SUB_BORROW = "SBRW",
-}
-
 export enum Currency {
   INR = "INR",
   USD = "USD",
   EUR = "EUR",
 }
 
-export enum WalletType {
-  CASH = "Cash",
-  BANK = "Bank",
-  CREDIT_CARD = "Credit Card",
-}
-
 export enum FrequencyType {
   EVERY_DAY = "EVERY_DAY",
   EVERY_MONTH = "EVERY_MONTH",
   EVERY_YEAR = "EVERY_YEAR",
-}
-
-export enum CategoryType {
-  INCOME = "INCOME",
-  EXPENSE = "EXPENSE",
-}
-
-export enum FrequencyType {
-  EVERY_DAY = "EVERY_DAY",
-  EVERY_MONTH = "EVERY_MONTH",
-  EVERY_YEAR = "EVERY_YEAR",
-}
-
-export enum CategoryType {
-  INCOME = "INCOME",
-  EXPENSE = "EXPENSE",
 }
 
 export interface User {
@@ -52,31 +20,7 @@ export interface User {
   photo: Blob | null;
 }
 
-export interface SplurTransaction {
-  id?: number;
-  assignedTo?: number; // WALLET ID (Ex. Cash Wallet, Bank Wallet)
-  assignedToWallet?: Wallet; // Will not be used in DB (will only be used in get)
-  timestamp: Date;
-  amount: number;
-  title?: string;
-  desc?: string;
-  exchanger?: string; // Person, UPI ID, BANK ACCOUNT One Liner Details, Mobile Number
-  exchangeType: ExchangeType; // Credit, Debit, Transfer, Borrow, Lend
-  transferFrom?: number; // WALLET ID (Ex. Cash Wallet, Bank Wallet)
-  transferFromWallet?: Wallet; // Will not be used in DB (will only be used in get)
-  transferTo?: number; // WALLET ID (Ex. Cash Wallet, Bank Wallet)
-  transferToWallet?: Wallet; // Will not be used in DB (will only be used in get)
-  // dismissed?: boolean; // Used for Lend OR BORROW
-  categoryId?: number;
-  category?: Category; // Will not be used in DB (will only be used in get)
-  // subcategory?: string;
-  autoCategoryMap?: boolean; // For marchant to Category or Sub Category Mapping
-  recurringId?: number; // To identify recurring transaction
-  loanId?: number; // To identify loan transaction
-}
-
-type refinedSplurTransaction = Omit<SplurTransaction, "recurringId">;
-export interface ScheduledTransaction extends refinedSplurTransaction {
+export interface ScheduledTransaction extends Omit<SplurTransaction, "recurringId"> {
   frequency: FrequencyType;
   jobHistory: Date[];
   blacklist: Date[];

@@ -1,44 +1,15 @@
 import type { IndexableType } from "dexie";
 import { CategoryOperations } from "./categoryOps";
-import type { Category, ScheduledTransaction, SplurTransaction, Wallet } from "./db";
-import db, { ExchangeType } from "./db";
+import type { ScheduledTransaction } from "./db";
+import db from "./db";
+import type { SplurTransaction, TransactionExtraData } from "./schema";
 import { TransactionOperations } from "./transactionOps";
 import { WalletOperations } from "./walletOps";
 
+type ScheduledTransactionWithData = ScheduledTransaction & TransactionExtraData;
+
 export class ScheduledTransactionOperations {
-  static mapObj(
-    wallets: Wallet[],
-    categories: Category[],
-    transaction?: ScheduledTransaction,
-  ): ScheduledTransaction | undefined {
-    if (!transaction) return undefined;
-
-    if (transaction.assignedTo)
-      transaction.assignedToWallet = WalletOperations.getObj(wallets, transaction?.assignedTo);
-
-    if (transaction.transferFrom)
-      transaction.transferFromWallet = WalletOperations.getObj(wallets, transaction?.transferFrom);
-
-    if (transaction.transferTo)
-      transaction.transferToWallet = WalletOperations.getObj(wallets, transaction?.transferTo);
-
-    if (transaction.categoryId)
-      transaction.category = CategoryOperations.getObj(categories, transaction.categoryId);
-
-    return transaction;
-  }
-
-  static objsNormalizer(
-    transactions: (ScheduledTransaction | undefined)[],
-  ): ScheduledTransaction[] {
-    const ret: ScheduledTransaction[] = [];
-    transactions.forEach(item => {
-      if (item) ret.push(item);
-    });
-    return ret;
-  }
-
-  static async get(walletId?: number): Promise<ScheduledTransaction[]> {
+  static async get(walletId?: number): Promise<ScheduledTransactionWithData[]> {
     const wallets = await WalletOperations.get();
     const categories = await CategoryOperations.get();
     let transactions = [];
@@ -55,20 +26,24 @@ export class ScheduledTransactionOperations {
       transactions = await db.scheduledTransactions.reverse().sortBy("timestamp");
     }
 
-    return this.objsNormalizer(transactions.map(item => this.mapObj(wallets, categories, item)));
+    return transactions.map(item =>
+      TransactionOperations.mapObj<ScheduledTransactionWithData>(wallets, categories, item),
+    );
   }
 
-  static async getById(transactionId?: number): Promise<ScheduledTransaction | undefined> {
+  static async getById(transactionId?: number): Promise<ScheduledTransactionWithData | undefined> {
     const wallets = await WalletOperations.get();
     const categories = await CategoryOperations.get();
     const transaction = await db.scheduledTransactions.get(transactionId as IndexableType);
 
     // Map category as well
     // WIP
-    return this.mapObj(wallets, categories, transaction);
+    return transaction
+      ? TransactionOperations.mapObj<ScheduledTransactionWithData>(wallets, categories, transaction)
+      : undefined;
   }
 
-  static async add(transaction: ScheduledTransaction): Promise<ScheduledTransaction> {
+  static async add(transaction: ScheduledTransaction): Promise<ScheduledTransactionWithData> {
     return await db.transaction(
       "rw",
       db.scheduledTransactions,
@@ -87,24 +62,26 @@ export class ScheduledTransactionOperations {
 
           const wallets = await WalletOperations.get();
           const categories = await CategoryOperations.get();
-          let newTransaction = await ScheduledTransactionOperations.getById(
+          const newTransaction = await ScheduledTransactionOperations.getById(
             newTransactionId as number,
           );
-          newTransaction = this.mapObj(wallets, categories, newTransaction);
 
-          if (newTransaction) return newTransaction;
+          if (!newTransaction) throw new Error("Transaction creation failed");
 
-          throw new Error("Transaction creation failed");
+          return TransactionOperations.mapObj<ScheduledTransactionWithData>(
+            wallets,
+            categories,
+            newTransaction,
+          );
         } catch (error) {
           console.log(error);
-          // return null;
           throw error;
         }
       },
     );
   }
 
-  static async edit(transaction: ScheduledTransaction): Promise<ScheduledTransaction> {
+  static async edit(transaction: ScheduledTransaction): Promise<ScheduledTransactionWithData> {
     return await db.transaction(
       "rw",
       db.scheduledTransactions,
@@ -123,8 +100,8 @@ export class ScheduledTransactionOperations {
 
           // Checking few of the things if prevTransaction is transfer and new transaction is not
           if (
-            prevTransaction?.exchangeType === ExchangeType.TRANSFER &&
-            transaction.exchangeType !== ExchangeType.TRANSFER
+            prevTransaction?.exchangeType === "Transfer" &&
+            transaction.exchangeType !== "Transfer"
           ) {
             transaction.transferFrom = undefined;
             transaction.transferTo = undefined;
@@ -135,14 +112,14 @@ export class ScheduledTransactionOperations {
           // Syncing wallet
           if (ret === 1 && prevTransaction) {
             // Gets updated transaction
-            const wallets = await WalletOperations.get();
-            const categories = await CategoryOperations.get();
-            let updatedTransaction = await ScheduledTransactionOperations.getById(transaction.id);
-            updatedTransaction = this.mapObj(wallets, categories, updatedTransaction);
-            if (updatedTransaction) return updatedTransaction;
           }
 
-          throw new Error("Transaction update failed");
+          const wallets = await WalletOperations.get();
+          const categories = await CategoryOperations.get();
+          const updatedTransaction = await ScheduledTransactionOperations.getById(transaction.id);
+          if (!updatedTransaction) throw new Error("Transaction update failed");
+
+          return TransactionOperations.mapObj(wallets, categories, updatedTransaction);
         } catch (error) {
           console.log(error);
           // return null;

@@ -1,4 +1,4 @@
-import type { SplurTransaction } from "@/model/db";
+import type { SplurTransaction } from "@/model/schema";
 import { Link, useLoaderData } from "react-router-dom";
 import TransactionsCard from "./TransactionsCard";
 
