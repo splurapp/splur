@@ -1,8 +1,9 @@
-import type { SplurTransaction, Wallet } from "@/model/db";
-import { ExchangeType } from "@/model/db";
+import type { SplurTransaction, Wallet } from "@/model/schema";
+import { ExchangeType } from "@/model/schema";
 import { TransactionOperations } from "@/model/transactionOps";
 import { WalletOperations } from "@/model/walletOps";
 import { useEffect, useState } from "react";
+import type { z } from "zod";
 
 interface Props {
   wallet: Wallet;
@@ -37,11 +38,12 @@ interface Props {
 // };
 
 const getExchangeType = (i: string) => {
-  if (ExchangeType.BORROW.toString() === i) return ExchangeType.BORROW;
-  if (ExchangeType.CREDIT.toString() === i) return ExchangeType.CREDIT;
-  if (ExchangeType.DEBIT.toString() === i) return ExchangeType.DEBIT;
-  if (ExchangeType.LEND.toString() === i) return ExchangeType.LEND;
-  return ExchangeType.TRANSFER;
+  if (i === ExchangeType.enum.Borrow) return ExchangeType.enum.Borrow;
+  if (i === ExchangeType.enum.Income) return ExchangeType.enum.Income;
+  if (i === ExchangeType.enum.Expense) return ExchangeType.enum.Expense;
+  if (i === ExchangeType.enum.Lend) return ExchangeType.enum.Lend;
+  if (i === ExchangeType.enum.Borrow) return ExchangeType.enum.Borrow;
+  return ExchangeType.enum.Transfer;
 };
 
 export default function EditTransaction({
@@ -56,27 +58,28 @@ export default function EditTransaction({
   const [transferTo, setTransferTo] = useState(() =>
     transaction.transferTo ? transaction.transferTo : 0,
   );
-  const [exchangeType, setExchangeType] = useState<ExchangeType>(transaction.exchangeType);
+  const [exchangeType, setExchangeType] = useState<z.infer<typeof ExchangeType>>(
+    transaction.exchangeType,
+  );
   const [amount, setAmount] = useState(() => transaction.amount);
 
   const updateTransaction = async () => {
-    if (exchangeType === ExchangeType.TRANSFER && (wallet.id === transferTo || transferTo === 0)) {
+    if (
+      exchangeType === ExchangeType.enum.Transfer &&
+      (wallet.id === transferTo || transferTo === 0)
+    ) {
       return;
     }
 
-    if (exchangeType !== ExchangeType.TRANSFER) {
+    if (exchangeType !== ExchangeType.enum.Transfer) {
       const myNewTransaction: SplurTransaction = {
         ...transaction,
         amount: amount,
         exchangeType: exchangeType,
       };
 
-      const currExchangeType = exchangeType as ExchangeType;
-      if (
-        transaction.exchangeType === ExchangeType.TRANSFER &&
-        currExchangeType !== ExchangeType.TRANSFER
-      ) {
-        myNewTransaction.assignedTo = transaction.transferFrom;
+      if (transaction.exchangeType === ExchangeType.enum.Transfer) {
+        myNewTransaction.walletId = transaction.transferFrom;
       }
 
       console.log(myNewTransaction);
@@ -89,7 +92,7 @@ export default function EditTransaction({
         exchangeType: exchangeType,
         transferFrom: wallet.id,
         transferTo: transferTo,
-        assignedTo: transferTo,
+        walletId: transferTo,
       };
       await TransactionOperations.edit(myNewTransaction);
     }
@@ -135,25 +138,25 @@ export default function EditTransaction({
                 value={exchangeType}
                 onChange={e => setExchangeType(getExchangeType(e.target.value))}
               >
-                <option key={1} value={ExchangeType.BORROW}>
+                <option key={1} value={ExchangeType.enum.Borrow}>
                   Borrow
                 </option>
-                <option key={2} value={ExchangeType.CREDIT}>
+                <option key={2} value={ExchangeType.enum.Income}>
                   Income
                 </option>
-                <option key={3} value={ExchangeType.DEBIT}>
+                <option key={3} value={ExchangeType.enum.Expense}>
                   Expense
                 </option>
-                <option key={4} value={ExchangeType.LEND}>
+                <option key={4} value={ExchangeType.enum.Lend}>
                   Lend
                 </option>
-                <option key={5} value={ExchangeType.TRANSFER}>
+                <option key={5} value={ExchangeType.enum.Transfer}>
                   Transfer
                 </option>
               </select>
             </label>
 
-            {exchangeType === ExchangeType.TRANSFER && (
+            {exchangeType === ExchangeType.enum.Transfer && (
               <label>
                 Transfer To:
                 <select

@@ -1,5 +1,5 @@
-import type { Category } from "./db";
 import db from "./db";
+import type { Category } from "./schema";
 
 export class CategoryOperations {
   static getObj(categories: Category[], id: number): Category | undefined {
@@ -15,7 +15,7 @@ export class CategoryOperations {
     return await db.categories.get(id);
   }
 
-  static async add(category: Category): Promise<Category | null> {
+  static async add(category: Category): Promise<Category> {
     return db.transaction("rw", db.categories, async () => {
       try {
         category.id = undefined;
@@ -27,7 +27,6 @@ export class CategoryOperations {
         return newCategory;
       } catch (error) {
         console.log(error);
-        // return null;
         throw error;
       }
     });

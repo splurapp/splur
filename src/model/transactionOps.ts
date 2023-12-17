@@ -1,48 +1,47 @@
-import type { IndexableType } from "dexie";
 import { CategoryOperations } from "./categoryOps";
-import type { Category, SplurTransaction, Wallet } from "./db";
-import db, { ExchangeType } from "./db";
+import db from "./db";
+import {
+  ExchangeType,
+  type Category,
+  type SplurTransaction,
+  type SplurTransactionWithData,
+  type Wallet,
+} from "./schema";
 import { WalletOperations } from "./walletOps";
 
 export class TransactionOperations {
-  static mapObj(
+  static mapObj<T extends SplurTransactionWithData>(
     wallets: Wallet[],
     categories: Category[],
-    transaction?: SplurTransaction,
-  ): SplurTransaction | undefined {
-    if (!transaction) return undefined;
+    transaction: T,
+  ): T {
+    if (transaction.walletId) {
+      transaction.assignedToWallet = WalletOperations.getObj(wallets, transaction?.walletId);
+    }
 
-    if (transaction.assignedTo)
-      transaction.assignedToWallet = WalletOperations.getObj(wallets, transaction?.assignedTo);
-
-    if (transaction.transferFrom)
+    if (transaction.transferFrom) {
       transaction.transferFromWallet = WalletOperations.getObj(wallets, transaction?.transferFrom);
+    }
 
-    if (transaction.transferTo)
+    if (transaction.transferTo) {
       transaction.transferToWallet = WalletOperations.getObj(wallets, transaction?.transferTo);
+    }
 
-    if (transaction.categoryId)
+    if (transaction?.categoryId) {
       transaction.category = CategoryOperations.getObj(categories, transaction.categoryId);
+    }
 
     return transaction;
   }
 
-  static objsNormalizer(transactions: (SplurTransaction | undefined)[]): SplurTransaction[] {
-    const ret: SplurTransaction[] = [];
-    transactions.forEach(item => {
-      if (item) ret.push(item);
-    });
-    return ret;
-  }
-
-  static async get(walletId?: number): Promise<SplurTransaction[]> {
+  static async get(walletId?: number): Promise<SplurTransactionWithData[]> {
     const wallets = await WalletOperations.get();
     const categories = await CategoryOperations.get();
     let transactions = [];
 
     if (walletId) {
       transactions = await db.splurTransactions
-        .where("assignedTo")
+        .where("walletId")
         .equals(walletId)
         .or("transferFrom")
         .equals(walletId)
@@ -52,32 +51,33 @@ export class TransactionOperations {
       transactions = await db.splurTransactions.reverse().sortBy("timestamp");
     }
 
-    return this.objsNormalizer(transactions.map(item => this.mapObj(wallets, categories, item)));
+    return transactions.map(transaction =>
+      this.mapObj<SplurTransactionWithData>(wallets, categories, transaction),
+    );
   }
 
-  static async getById(transactionId?: number): Promise<SplurTransaction | undefined> {
+  static async getById(transactionId: number): Promise<SplurTransactionWithData> {
     const wallets = await WalletOperations.get();
     const categories = await CategoryOperations.get();
-    const transaction = await db.splurTransactions.get(transactionId as IndexableType);
+    const transaction = await db.splurTransactions.get(transactionId);
 
-    // Map category as well
-    // WIP
-    return this.mapObj(wallets, categories, transaction);
+    if (!transaction) throw new Error(`No such transaction with id = ${transactionId}`);
+    return this.mapObj<SplurTransactionWithData>(wallets, categories, transaction);
   }
 
   // WIP
-  static async bulkGet(walletIds: number[]): Promise<SplurTransaction[]> {
+  static async bulkGet(walletIds: number[]): Promise<(SplurTransaction | undefined)[]> {
     if (walletIds?.length > 0) {
       const wallets = await WalletOperations.get();
       const categories = await CategoryOperations.get();
       const transactions = await db.splurTransactions.bulkGet(walletIds);
-      return this.objsNormalizer(transactions.map(item => this.mapObj(wallets, categories, item)));
+      return transactions.map(item => (item ? this.mapObj(wallets, categories, item) : item));
     }
 
     return [];
   }
 
-  static async getByYear(year: number, walletId?: number | null): Promise<SplurTransaction[]> {
+  static async getByYear(year: number, walletId?: number): Promise<SplurTransaction[]> {
     const startOfYear = new Date(year, 0, 1);
     const endOfYear = new Date(year, 11, 31);
     const wallets = await WalletOperations.get();
@@ -88,7 +88,7 @@ export class TransactionOperations {
       transactions = await db.splurTransactions
         .where("timestamp")
         .between(startOfYear, endOfYear, true, true)
-        .and(record => record.assignedTo === walletId)
+        .and(record => record.walletId === walletId)
         .reverse()
         .sortBy("timestamp");
     } else {
@@ -99,7 +99,7 @@ export class TransactionOperations {
         .sortBy("timestamp");
     }
 
-    return this.objsNormalizer(transactions.map(item => this.mapObj(wallets, categories, item)));
+    return transactions.map(item => this.mapObj(wallets, categories, item));
   }
 
   static async getByMonth(month: number, walletId?: number | null): Promise<SplurTransaction[]> {
@@ -113,7 +113,7 @@ export class TransactionOperations {
       transactions = await db.splurTransactions
         .where("timestamp")
         .between(startOfMonth, endOfMonth, true, true)
-        .and(record => record.assignedTo === walletId)
+        .and(record => record.walletId === walletId)
         .reverse()
         .sortBy("timestamp");
     } else {
@@ -124,7 +124,7 @@ export class TransactionOperations {
         .sortBy("timestamp");
     }
 
-    return this.objsNormalizer(transactions.map(item => this.mapObj(wallets, categories, item)));
+    return transactions.map(item => this.mapObj(wallets, categories, item));
   }
 
   static async getByDate(date: Date, walletId?: number | null): Promise<SplurTransaction[]> {
@@ -136,14 +136,14 @@ export class TransactionOperations {
       transactions = await db.splurTransactions
         .where("timestamp")
         .equals(date)
-        .and(record => record.assignedTo === walletId)
+        .and(record => record.walletId === walletId)
         .reverse()
         .sortBy("timestamp");
     } else {
       transactions = await db.splurTransactions.where("timestamp").equals(date).toArray();
     }
 
-    return this.objsNormalizer(transactions.map(item => this.mapObj(wallets, categories, item)));
+    return transactions.map(item => this.mapObj(wallets, categories, item));
   }
 
   static async getByDateRange(
@@ -159,7 +159,7 @@ export class TransactionOperations {
       transactions = await db.splurTransactions
         .where("timestamp")
         .between(startDate, endDate, true, true)
-        .and(record => record.assignedTo === walletId)
+        .and(record => record.walletId === walletId)
         .reverse()
         .sortBy("timestamp");
     } else {
@@ -170,7 +170,7 @@ export class TransactionOperations {
         .sortBy("timestamp");
     }
 
-    return this.objsNormalizer(transactions.map(item => this.mapObj(wallets, categories, item)));
+    return transactions.map(item => this.mapObj(wallets, categories, item));
   }
 
   static async add(transaction: SplurTransaction): Promise<SplurTransaction> {
@@ -197,12 +197,10 @@ export class TransactionOperations {
 
         const wallets = await WalletOperations.get();
         const categories = await CategoryOperations.get();
-        let newTransaction = await TransactionOperations.getById(newTransactionId as number);
-        newTransaction = this.mapObj(wallets, categories, newTransaction);
+        const newTransaction = await TransactionOperations.getById(newTransactionId as number);
+        if (!newTransaction) throw new Error("Transaction creation failed");
 
-        if (newTransaction) return newTransaction;
-
-        throw new Error("Transaction creation failed");
+        return this.mapObj(wallets, categories, newTransaction);
       } catch (error) {
         console.log(error);
         // return null;
@@ -264,8 +262,8 @@ export class TransactionOperations {
 
         // Checking few of the things if prevTransaction is transfer and new transaction is not
         if (
-          prevTransaction?.exchangeType === ExchangeType.TRANSFER &&
-          transaction.exchangeType !== ExchangeType.TRANSFER
+          prevTransaction?.exchangeType === "Transfer" &&
+          transaction.exchangeType !== "Transfer"
         ) {
           transaction.transferFrom = undefined;
           transaction.transferTo = undefined;
@@ -280,16 +278,15 @@ export class TransactionOperations {
 
           // Synced new modified transaction
           await WalletOperations.sync(transaction);
-
-          // Gets updated transaction
-          const wallets = await WalletOperations.get();
-          const categories = await CategoryOperations.get();
-          let updatedTransaction = await TransactionOperations.getById(transaction.id);
-          updatedTransaction = this.mapObj(wallets, categories, updatedTransaction);
-          if (updatedTransaction) return updatedTransaction;
         }
 
-        throw new Error("Transaction update failed");
+        // Gets updated transaction
+        const wallets = await WalletOperations.get();
+        const categories = await CategoryOperations.get();
+        const updatedTransaction = await TransactionOperations.getById(transaction.id);
+        if (!updatedTransaction) throw new Error("Transaction update failed");
+
+        return this.mapObj(wallets, categories, updatedTransaction);
       } catch (error) {
         console.log(error);
         // return null;
@@ -305,7 +302,7 @@ export class TransactionOperations {
         if (!transaction) throw new Error("Transaction doesn't exists");
 
         if (LoanOperations.isLoan(transaction)) {
-          await db.splurTransactions.update(id, { assignedTo: undefined });
+          await db.splurTransactions.update(id, { walletId: undefined });
         } else {
           await db.splurTransactions.delete(id);
         }
@@ -336,7 +333,7 @@ export class TransactionOperations {
         for (const transaction of transactions) {
           if (transaction?.id) {
             if (LoanOperations.isLoan(transaction)) {
-              transaction.assignedTo = undefined;
+              transaction.walletId = undefined;
               transactionIdsWithLoan.push(transaction);
             } else {
               transactionIdsWithoutLoan.push(transaction.id);
@@ -360,12 +357,10 @@ export class TransactionOperations {
 
 export class LoanOperations {
   static isLoan(transaction: SplurTransaction): boolean {
-    return [
-      ExchangeType.BORROW,
-      ExchangeType.SUB_BORROW,
-      ExchangeType.LEND,
-      ExchangeType.SUB_LEND,
-    ].includes(transaction.exchangeType);
+    return (
+      transaction.exchangeType in
+      ExchangeType.extract(["Borrow", "SubBorrow", "Lend", "SubLend"]).Values
+    );
   }
 
   static async get(parentId?: number): Promise<SplurTransaction[]> {
@@ -385,19 +380,14 @@ export class LoanOperations {
         .sortBy("timestamp");
     }
 
-    return TransactionOperations.objsNormalizer(
-      transactions.map(item => TransactionOperations.mapObj(wallets, categories, item)),
-    );
+    return transactions.map(item => TransactionOperations.mapObj(wallets, categories, item));
   }
 
   // Only for Parent loan obj
   static async create(transaction: SplurTransaction): Promise<SplurTransaction> {
     return await db.transaction("rw", db.splurTransactions, db.wallets, db.categories, async () => {
       try {
-        if (
-          transaction.exchangeType !== ExchangeType.BORROW &&
-          transaction.exchangeType !== ExchangeType.LEND
-        ) {
+        if (transaction.exchangeType !== "Borrow" && transaction.exchangeType !== "Lend") {
           throw new Error("Only Borrow and Lend transaction allowed for this operation");
         }
 
@@ -406,18 +396,17 @@ export class LoanOperations {
         if (!objIndex) throw new Error("Transaction creation failed");
 
         // Sync wallet
-        if (transaction.assignedTo) {
+        if (transaction.walletId) {
           await WalletOperations.sync(transaction);
         }
 
         // Gets transaction
         const wallets = await WalletOperations.get();
         const categories = await CategoryOperations.get();
-        let newTransaction = await TransactionOperations.getById(objIndex as number);
-        newTransaction = TransactionOperations.mapObj(wallets, categories, newTransaction);
+        const newTransaction = await TransactionOperations.getById(objIndex as number);
+        if (!newTransaction) throw new Error("transaction creation failed");
 
-        if (newTransaction) return newTransaction;
-        throw new Error("transaction creation failed");
+        return TransactionOperations.mapObj(wallets, categories, newTransaction);
       } catch (error) {
         console.log(error);
         // return null;
@@ -435,27 +424,22 @@ export class LoanOperations {
         const parent = await TransactionOperations.getById(parentId);
         if (!parent) throw new Error("Parent doesn't exists");
 
-        if (
-          parent.exchangeType !== ExchangeType.BORROW &&
-          parent.exchangeType !== ExchangeType.LEND
-        ) {
+        if (parent.exchangeType !== "Borrow" && parent.exchangeType !== "Lend") {
           throw new Error("Only Borrow and Lend parent transaction allowed for this operation");
         }
 
         if (
-          (parent.exchangeType === ExchangeType.BORROW &&
-            transaction.exchangeType !== ExchangeType.SUB_BORROW) ||
-          (parent.exchangeType === ExchangeType.LEND &&
-            transaction.exchangeType !== ExchangeType.SUB_LEND)
+          (parent.exchangeType === "Borrow" && transaction.exchangeType !== "SubBorrow") ||
+          (parent.exchangeType === "Lend" && transaction.exchangeType !== "SubLend")
         ) {
           throw new Error(
             `Parent [${parent.exchangeType}] & Child [${transaction.exchangeType}] exchange type is not matching`,
           );
         }
 
-        if (transaction.assignedTo) {
+        if (transaction.walletId) {
           // Validate if assigned to Really exists in DB
-          const wallet = await WalletOperations.getById(transaction.assignedTo);
+          const wallet = await WalletOperations.getById(transaction.walletId);
 
           if (!wallet) throw new Error("Assigned wallet id doesn't exists");
         }
@@ -464,17 +448,17 @@ export class LoanOperations {
         const transactionId = await db.splurTransactions.add(transaction);
         if (!transactionId) throw new Error("Transaction creation failed");
 
-        if (transaction.assignedTo) {
+        if (transaction.walletId) {
           await WalletOperations.sync(transaction);
         }
 
         // Gets transaction
         const wallets = await WalletOperations.get();
         const categories = await CategoryOperations.get();
-        let newTransaction = await TransactionOperations.getById(transactionId as number);
-        newTransaction = TransactionOperations.mapObj(wallets, categories, newTransaction);
-        if (newTransaction) return newTransaction;
-        throw new Error("transaction creation failed");
+        const newTransaction = await TransactionOperations.getById(transactionId as number);
+        if (!newTransaction) throw new Error("transaction creation failed");
+
+        return TransactionOperations.mapObj(wallets, categories, newTransaction);
       } catch (error) {
         console.log(error);
         // return null;
@@ -493,36 +477,30 @@ export class LoanOperations {
         const prevTransaction = await TransactionOperations.getById(transaction.id);
 
         const ret = await db.splurTransactions.update(transaction.id, {
-          assignedTo: transaction.assignedTo,
+          walletId: transaction.walletId,
           amount: transaction.amount,
         });
 
         // Syncing wallet
         if (ret === 1 && prevTransaction) {
-          if (prevTransaction.assignedTo) {
+          if (prevTransaction.walletId) {
             // Popped previous transaction
             await WalletOperations.sync(prevTransaction, true);
           }
 
-          if (transaction.assignedTo) {
+          if (transaction.walletId) {
             // Synced new modified transaction
             await WalletOperations.sync(transaction);
           }
-
-          // Gets updated transaction
-          const wallets = await WalletOperations.get();
-          const categories = await CategoryOperations.get();
-          let updatedTransaction = await TransactionOperations.getById(transaction.id);
-          updatedTransaction = TransactionOperations.mapObj(
-            wallets,
-            categories,
-            updatedTransaction,
-          );
-
-          if (updatedTransaction) return updatedTransaction;
         }
 
-        throw new Error("Transaction update failed.");
+        // Gets updated transaction
+        const wallets = await WalletOperations.get();
+        const categories = await CategoryOperations.get();
+        const updatedTransaction = await TransactionOperations.getById(transaction.id);
+        if (!updatedTransaction) throw new Error("Transaction update failed.");
+
+        return TransactionOperations.mapObj(wallets, categories, updatedTransaction);
       } catch (error) {
         console.log(error);
         // return null;
@@ -539,7 +517,7 @@ export class LoanOperations {
 
         // Reverting wallet changes whatever parent or child is associated with wallet
         for (const transaction of loanTransactions) {
-          if (transaction.assignedTo) {
+          if (transaction?.walletId) {
             await WalletOperations.sync(transaction, true);
           }
         }
@@ -570,15 +548,14 @@ export class LoanOperations {
         if (childTransaction.id === childTransaction.loanId) {
           throw new Error("Parent loan transaction not allowed for this operation");
         }
-
         if (
-          ![ExchangeType.SUB_BORROW, ExchangeType.SUB_LEND].includes(childTransaction.exchangeType)
+          !(childTransaction.exchangeType in ExchangeType.extract(["SubBorrow", "SubLend"]).Values)
         ) {
           throw new Error("Other exchange types are not allowed for this operation");
         }
 
         // Revert wallet changes
-        if (childTransaction.assignedTo) {
+        if (childTransaction.walletId) {
           await WalletOperations.sync(childTransaction, true);
         }
 
@@ -600,23 +577,16 @@ export class LoanOperations {
 
         if (!transaction) throw new Error("Provided transaction id not exists");
 
-        if (
-          ![
-            ExchangeType.BORROW,
-            ExchangeType.SUB_BORROW,
-            ExchangeType.LEND,
-            ExchangeType.SUB_LEND,
-          ].includes(transaction.exchangeType)
-        ) {
+        if (!this.isLoan(transaction)) {
           throw new Error("Other exchange types are not allowed for this operation");
         }
 
         // Revert wallet changes
-        if (transaction.assignedTo) {
+        if (transaction.walletId) {
           await WalletOperations.sync(transaction, true);
         }
 
-        await db.splurTransactions.update(transactionId, { assignedTo: undefined });
+        await db.splurTransactions.update(transactionId, { walletId: undefined });
 
         return transactionId;
       } catch (error) {

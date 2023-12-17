@@ -1,4 +1,4 @@
-import type { SplurTransaction } from "@/model/db";
+import type { SplurTransaction } from "@/model/schema";
 import { LoanOperations } from "@/model/transactionOps";
 import { useState } from "react";
 

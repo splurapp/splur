@@ -1,5 +1,4 @@
-import type { SplurTransaction, Wallet } from "@/model/db";
-import { ExchangeType } from "@/model/db";
+import { ExchangeType, type SplurTransaction, type Wallet } from "@/model/schema";
 import { TransactionOperations } from "@/model/transactionOps";
 import { useEffect, useState } from "react";
 import AddTransaction from "./AddTransaction";
@@ -24,15 +23,15 @@ export default function Transactions({ wallet, refresh }: Props) {
   useEffect(() => {
     let amount = 0;
     transactions.forEach(item => {
-      if (item.exchangeType !== ExchangeType.TRANSFER) {
+      if (item.exchangeType !== ExchangeType.enum.Transfer) {
         if (
-          item.exchangeType === ExchangeType.BORROW ||
-          item.exchangeType === ExchangeType.CREDIT
+          item.exchangeType === ExchangeType.enum.Borrow ||
+          item.exchangeType === ExchangeType.enum.Income
         ) {
           amount = amount + item.amount;
         } else if (
-          item.exchangeType === ExchangeType.LEND ||
-          item.exchangeType === ExchangeType.DEBIT
+          item.exchangeType === ExchangeType.enum.Lend ||
+          item.exchangeType === ExchangeType.enum.Expense
         ) {
           amount = amount - item.amount;
         }

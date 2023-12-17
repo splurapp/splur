@@ -1,5 +1,4 @@
-import type { Wallet } from "@/model/db";
-import { WalletType } from "@/model/db";
+import { WalletType, type Wallet } from "@/model/schema";
 import { WalletOperations } from "@/model/walletOps";
 import { useState } from "react";
 import EditWallet from "./EditWallet";
@@ -19,7 +18,7 @@ export default function Dev() {
   const createWallet = async () => {
     const myWallet: Wallet = {
       name: walletName,
-      type: WalletType.BANK,
+      type: WalletType.enum.Bank,
       amount: walletAmount,
     };
     await WalletOperations.create(myWallet);

@@ -12,10 +12,12 @@ import Accounts from "./accounts";
 import NewAccount from "./accounts/new";
 import Dev from "./dev/Dev";
 import Home from "./home";
-import { loader as transactionLoader } from "./home/transaction-loader";
+import { loader as transactionLoader } from "./home/home.service";
 import AccountSetup from "./setup/AccountSetup";
 import Hello from "./setup/Hello";
-import { loader as walletLoader } from "./setup/walletLoader";
+import { action as walletAction, loader as walletLoader } from "./setup/account-setup.service";
+import Track from "./track";
+import { action as trackAction, loader as trackLoader } from "./track/track.service";
 
 export const router = createBrowserRouter([
   {
@@ -54,11 +56,9 @@ export const router = createBrowserRouter([
           },
           {
             path: "track/:id?",
-            lazy: () => import("./track"),
-            async loader({ params, request }) {
-              const { loader } = await import("./track/track-loader");
-              return loader({ params, request });
-            },
+            element: <Track />,
+            loader: trackLoader,
+            action: trackAction,
           },
           {
             path: "accounts",
@@ -102,6 +102,7 @@ export const router = createBrowserRouter([
             path: "account",
             element: <AccountSetup />,
             loader: walletLoader,
+            action: walletAction,
           },
         ],
       },
