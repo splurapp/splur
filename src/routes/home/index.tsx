@@ -17,15 +17,14 @@ function getAmounts(transactions: SplurTransaction[]) {
 }
 
 export default function Home() {
-  const [transactions, wallets] = useLoaderData() as Awaited<ReturnType<typeof loader>>;
-  const totalBalance = wallets.reduce((prev, curr) => (prev += curr.amount), 0);
+  const transactions = useLoaderData() as Awaited<ReturnType<typeof loader>>;
   const { totalExpense, totalIncome } = getAmounts(transactions);
 
   return (
     <main className="flex flex-col gap-3">
-      <Link to="/wallets">
-        <header>
-          <div className="stats w-full border border-primary bg-primary bg-opacity-30 text-primary-content">
+      <Link to="accounts">
+        <div>
+          <div className="stats border-primary bg-primary text-primary-content w-full border bg-opacity-30">
             <div className="stat">
               <div className="stat-title">Income</div>
               <div className="stat-value text-success">{formatCurrency(totalIncome)}</div>
@@ -36,8 +35,7 @@ export default function Home() {
               <div className="stat-value text-error">{formatCurrency(totalExpense)}</div>
             </div>
           </div>
-          <p>Balance: {formatCurrency(totalBalance)}</p>
-        </header>
+        </div>
       </Link>
 
       <section>

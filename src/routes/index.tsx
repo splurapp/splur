@@ -11,7 +11,9 @@ import PWAInstallDone from "./PWAInstallDone";
 import Reports from "./Reports";
 import Settings from "./Settings";
 import Accounts from "./accounts";
-import NewAccount from "./accounts/new";
+import AccountDetails from "./accounts/AccountDetails";
+import AddOrEditAccount from "./accounts/AddOrEditAccount";
+import { loader as accountServiceLoader } from "./accounts/account.service";
 import Dev from "./dev/Dev";
 import Home from "./home";
 import { loader as transactionLoader } from "./home/home.service";
@@ -44,8 +46,9 @@ export const router = createBrowserRouter(
         </Route>
         <Route path="track/:id?" element={<Track />} loader={trackLoader} action={trackAction} />
         <Route path="accounts">
-          <Route index element={<Accounts />} />
-          <Route path="new" element={<NewAccount />} />
+          <Route index element={<Accounts />} loader={accountServiceLoader} />
+          <Route path=":id" element={<AccountDetails />} />
+          <Route path="add/:id?" element={<AddOrEditAccount />} />
         </Route>
         <Route path="borrowing" element={<Borrowing />} />
         <Route path="notifications" element={<Notifications />} />
