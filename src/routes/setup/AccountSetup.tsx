@@ -52,7 +52,7 @@ export default function AccountSetup() {
                     type="submit"
                     name="wallet"
                     value={wallet.name}
-                    className="btn btn-neutral btn-outline"
+                    className="btn btn-outline btn-neutral"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"

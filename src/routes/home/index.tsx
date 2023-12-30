@@ -24,7 +24,7 @@ export default function Home() {
     <main className="flex flex-col gap-3">
       <Link to="accounts">
         <div>
-          <div className="stats border-primary bg-primary text-primary-content w-full border bg-opacity-30">
+          <div className="stats w-full border border-primary bg-primary bg-opacity-30 text-primary-content">
             <div className="stat">
               <div className="stat-title">Income</div>
               <div className="stat-value text-success">{formatCurrency(totalIncome)}</div>
