@@ -25,6 +25,10 @@ import { action as trackAction, loader as trackLoader } from "./track/track.serv
 
 // This is a root loader that redirects to setup if the app is not setup yet.
 function rootLoader({ request }: LoaderFunctionArgs<unknown>) {
+  if (request.url.includes("/dev")) {
+    return null;
+  }
+
   const isSetupDone = isInitialSetupDone();
   if (request.url.includes("/setup")) {
     return isSetupDone ? redirect("/") : null;
@@ -63,10 +67,9 @@ export const router = createBrowserRouter(
             action={walletAction}
           />
         </Route>
+        <Route path="dev" element={<Dev />} />
+        <Route path="*" element={<NotFound />} />
       </Route>
-
-      <Route path="dev" element={<Dev />} />
-      <Route path="*" element={<NotFound />} />
     </>,
   ),
 );
