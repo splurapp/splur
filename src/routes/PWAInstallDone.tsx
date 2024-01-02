@@ -15,7 +15,7 @@ export default function PWAInstallDone() {
 
   return (
     <main className="flex h-[100dvh] w-full flex-col items-center justify-center bg-primary px-3">
-      <div className="card border border-primary-content shadow-xl">
+      <div className="card border-primary-content border shadow-xl">
         <div className="card-body">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -27,7 +27,7 @@ export default function PWAInstallDone() {
             strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
-            className="h-16 w-16 text-primary-content"
+            className="text-primary-content h-16 w-16"
           >
             <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
             <polyline points="22 4 12 14.01 9 11.01"></polyline>
