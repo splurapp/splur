@@ -1,3 +1,4 @@
+import { usePwaInstall } from "@/hooks/usePwaInstall";
 import {
   Button,
   Modal,
@@ -7,53 +8,18 @@ import {
   ModalHeader,
   useDisclosure,
 } from "@nextui-org/react";
-import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 export default function Hello() {
   const navigate = useNavigate();
-  const installEvent = useRef<BeforeInstallPromptEvent | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const { isOpen, onOpenChange } = useDisclosure({ isOpen: isModalOpen });
-
-  const handlePwaInstall = async () => {
-    if (!installEvent.current) {
-      return;
-    }
-
-    await installEvent.current.prompt();
-    const result = await installEvent.current.userChoice;
-    if (result.outcome === "accepted") {
-      setIsModalOpen(false);
-      installEvent.current = null;
+  const { installPWA, onClose, isReadToInstall } = usePwaInstall({
+    onAccepted: () => {
       if (/Android|webOS|iPhone|iPad|iPod|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
         navigate("/install-done");
       }
-    } else {
-      console.log("Installation denied!");
-    }
-  };
-
-  const handleClose = () => {
-    setIsModalOpen(false);
-    installEvent.current = null;
-  };
-
-  useEffect(() => {
-    const handleBeforeInstallPrompt = (e: Event) => {
-      if ("BeforeInstallPromptEvent" in window) {
-        e.preventDefault();
-        installEvent.current = e as BeforeInstallPromptEvent;
-        setIsModalOpen(true);
-      }
-    };
-
-    window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
-
-    return () => {
-      window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
-    };
-  }, []);
+    },
+  });
+  const { isOpen, onOpenChange } = useDisclosure({ isOpen: isReadToInstall });
 
   return (
     <main className="flex h-[100svh] flex-col items-center justify-center gap-2">
@@ -65,7 +31,7 @@ export default function Hello() {
         </Button>
       </Link>
 
-      <Modal isOpen={isOpen} onOpenChange={onOpenChange} onClose={handleClose} backdrop="blur">
+      <Modal isOpen={isOpen} onOpenChange={onOpenChange} backdrop="blur" onClose={onClose}>
         <ModalContent>
           <ModalHeader className="flex flex-col gap-1">Installation</ModalHeader>
           <ModalBody>
@@ -75,7 +41,7 @@ export default function Hello() {
             </p>
           </ModalBody>
           <ModalFooter>
-            <Button color="primary" fullWidth onPress={() => void handlePwaInstall()}>
+            <Button color="primary" fullWidth onPress={() => void installPWA()}>
               Add to homescreen
             </Button>
           </ModalFooter>
