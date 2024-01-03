@@ -4,7 +4,7 @@ export default function LayoutWithNav() {
   return (
     <>
       <Outlet />
-      <nav className="btm-nav btm-nav-sm absolute">
+      <footer className="btm-nav btm-nav-sm absolute">
         <NavLink to="/">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -50,7 +50,7 @@ export default function LayoutWithNav() {
           </svg>
           <span className="btm-nav-label">Others</span>
         </NavLink>
-      </nav>
+      </footer>
     </>
   );
 }
