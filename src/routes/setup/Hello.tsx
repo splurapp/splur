@@ -26,14 +26,14 @@ export default function Hello() {
       <h1 className="text-5xl font-bold italic">Splur.</h1>
       <p className="text-sm">An open source personal expense manager app</p>
       <Link to="account">
-        <Button size="lg" color="primary" className="mt-5">
+        <Button size="lg" variant="shadow" color="primary" className="mt-5">
           Let's Go
         </Button>
       </Link>
 
       <Modal isOpen={isOpen} onOpenChange={onOpenChange} backdrop="blur" onClose={onClose}>
         <ModalContent>
-          <ModalHeader className="flex flex-col gap-1">Installation</ModalHeader>
+          <ModalHeader>Installation</ModalHeader>
           <ModalBody>
             <p>
               This app is intended to be used as standalone app, we recommend installing the app to
