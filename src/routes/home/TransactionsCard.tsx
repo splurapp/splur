@@ -10,7 +10,7 @@ export default function TransactionsCard({ data }: { data: SplurTransactionWithD
       <Card fullWidth>
         <CardBody className="flex-row items-center gap-3">
           <Button variant="flat" size="lg" isIconOnly className="text-xl">
-            {data.category?.icon ?? "❓"}
+            {data.exchangeType === "Transfer" ? "💸" : data.category?.icon ?? "❓"}
           </Button>
 
           <div>
