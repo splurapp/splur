@@ -53,7 +53,8 @@ export default function Home() {
         isIconOnly
         color="primary"
         size="lg"
-        className="fixed bottom-20 right-3"
+        variant="shadow"
+        className="fixed bottom-20 right-3 h-16 w-16"
         title="Add transaction icon"
       >
         <svg
