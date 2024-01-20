@@ -1,6 +1,6 @@
 import type { Category } from "@/model/schema";
 import { Button, Input, Select, SelectItem } from "@nextui-org/react";
-import * as dayjs from "dayjs";
+import dayjs from "dayjs";
 import { useMemo } from "react";
 import { useFetcher } from "react-router-dom";
 import type { LoaderData as TrackLoaderData } from "./track.service";
