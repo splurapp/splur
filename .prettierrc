@@ -8,5 +8,6 @@
   "trailingComma": "all",
   "bracketSpacing": true,
   "bracketSameLine": false,
+  "endOfLine": "lf",
   "plugins": ["prettier-plugin-tailwindcss"]
 }
